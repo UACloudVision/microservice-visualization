@@ -1,0 +1,22 @@
+<GraphWrapper
+                height={data["height"]}
+                width={data["width"]}
+                search={data["search"]}
+                threshold={data["threshold"]}
+                graphRef={data["graphRef"]}
+                graphData={data["graph"]}
+                setInitCoords={setInitCoords}
+                setInitRotation={setInitRotation}
+                is3d={data["is3d"]}
+                antiPattern={data["antiPattern"]}
+                colorMode={data["colorMode"]}
+                defNodeColor={data["defNodeColor"]}
+                setDefNodeColor={setDefNodeColor}
+                setGraphData={setGraphData}
+                isDarkMode={data["isDarkMode"]}
+                selectedAntiPattern={data["selectedAntiPattern"]}
+                trackNodes={data["trackNodes"]}
+                focusNode={data["focusNode"]}
+            />
+            
+            </>

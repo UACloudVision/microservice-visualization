@@ -52,6 +52,7 @@ const VisualizationOptions: React.FC<Props> = ({
     const GraphProps = {
         sharedProps: Shared2D3DProps,
     };
+    
 
     return (
         <div>

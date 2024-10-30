@@ -3,13 +3,24 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { setupAxios, setupLogger } from "./utils/axiosSetup";
+import getData from "./getData.js";
+import axios from "axios";
+
+
+setupLogger();
+setupAxios();
+let graphData = getData(undefined);
+console.log(graphData);
+//const graphLifespan = axios.post(`/graph/create`, graphData);
+//console.log(graphLifespan);
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <React.StrictMode>
-        <App />
+        <App data={graphData}/>
     </React.StrictMode>
 );
 

@@ -52,6 +52,7 @@ const GraphMode: React.FC<Props> = ({
   const handleSelectPattern = (e: any) => {
     setSelectedAntiPattern(e.target.value);
   };
+  
 
   return (
     <div className="absolute top-2 left-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-52 max-h-full">
@@ -186,6 +187,7 @@ const GraphMode: React.FC<Props> = ({
       ) : (
         <></>
       )}
+      
     </div>
   );
 };

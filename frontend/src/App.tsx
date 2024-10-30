@@ -3,15 +3,21 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
-import myData from "./data/mock5.json";
+import myData from "./data/IR 1.json";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import axios from "axios";
 import TrackNodeMenu from "./components/TrackNodeMenu";
+import FilterBox from "./page.js";
+import { BrowserRouter, Router } from "react-router-dom";
+import { Routes } from "react-router-dom";
+import { Route } from "react-router-dom";
+import NewPage from "./node.js";
 
-function App() {
+
+function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
     const [value, setValue] = useState(8);
@@ -32,27 +38,47 @@ function App() {
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
 
-    setupLogger();
-    setupAxios();
+   
+    
 
+    //useEffect(() => {
+        //const getGraphLifespan = async () => {
+            //const graphLifespan = await axios.get(`/graph/${graphName}`);
+            //console.log(graphLifespan);
+            //setGraphTimeline(graphLifespan.data);
+            //setGraphData(graphLifespan.data[0] ?? null);
+            //setCurrentInstance(0);
+       // };
+
+        //getGraphLifespan();
+    //}, [graphName]);
+    console.log(data["data"]);
     useEffect(() => {
         const getGraphLifespan = async () => {
-            const graphLifespan = await axios.get(`/graph/${graphName}`);
-            setGraphTimeline(graphLifespan.data);
-            setGraphData(graphLifespan.data[0] ?? null);
+            
+           
+            setGraphTimeline([myData]);
+            setGraphData(data["data"]);
             setCurrentInstance(0);
         };
 
         getGraphLifespan();
     }, [graphName]);
-
+   
     if (typeof currentInstance == "undefined" || !graphTimeline) {
-        // Ideally just return a prompt to upload a file or use some default file
+        //Ideally just return a prompt to upload a file or use some default file
         return null;
     }
-
+    console.log(graphRef);
     return (
-        <div
+       <BrowserRouter >
+        <Routes>
+          <Route path="/" element=  
+          
+        
+        
+        {<div
+           
             className={`max-w-full min-h-screen max-h-screen overflow-clip ${
                 isDark ? `bg-gray-900` : `bg-gray-100`
             }`}
@@ -70,6 +96,13 @@ function App() {
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
             />
+            
+            <FilterBox
+                graphData={graphData}
+                
+            >
+            </FilterBox>
+            
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
                 graphRef={graphRef}
@@ -148,8 +181,13 @@ function App() {
                 graphTimeline={graphTimeline}
                 currentInstance={currentInstance}
             />
-        </div>
+        </div>}
+        /> 
+        <Route path="/node" element={<NewPage/>}/>
+        </Routes>
+        </BrowserRouter>
     );
 }
+
 
 export default App;
