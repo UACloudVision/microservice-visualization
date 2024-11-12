@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import getGraphData from "./getData.js";
 import myData from "./data/IR323_3138.json";
+import getConnections from "./createConnections.js"
 
 
 function getData(data){
@@ -92,6 +93,7 @@ export default function FilterBox(values){
         //let links = graphData["links"];
         //let temp_links = [];
         let nodes = [];
+
        
         for (let i=0; i<microservices.length; i++ ){
             let microservice = microservices[i];
@@ -101,6 +103,7 @@ export default function FilterBox(values){
             
         }
         let data = getGraphData(nodes);
+
         //for (let i=0; i<links.length; i++){
           //let link = links[i];
           //let source = link["source"]["nodeName"];
@@ -116,8 +119,10 @@ export default function FilterBox(values){
       //console.log(values);
       //data["graphData"] = temp;
       //console.log(data);
+      let connections = getConnections(nodes, data["links"]);
+      console.log(connections);
       console.log(data);
-      navigate('/node', {state: JSON.stringify(data)});
+      navigate('/node', {state: JSON.stringify(connections)});
 
     }
       

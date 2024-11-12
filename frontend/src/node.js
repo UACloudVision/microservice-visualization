@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { useLocation } from 'react-router-dom';
 import GraphWrapper from "./components/graph/GraphWrapper";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
+import { InfoBox } from "./components/graph/NodeInfoBox";
+import Menu from "./components/graph/RightClickNodeMenu";
 
 import axios from "axios";
 
@@ -34,24 +36,19 @@ export default function Node(){
     console.log(data);
     
     
-    
-    
-    
         return (
             <div className={`max-w-full min-h-screen max-h-screen overflow-clip ${
                 isDark ? `bg-gray-900` : `bg-gray-100`
             }`}
             
-            >
-
-            
+            >  
             <GraphWrapper
                 height={ref?.current?.clientHeight ?? 735}
                 width={ref?.current?.clientWidth ?? 1710}
                 search={search}
                 threshold={value}
                 graphRef={graphRef}
-                graphData={data}
+                graphData={graphData}
                 setInitCoords={setInitCoords}
                 setInitRotation={setInitRotation}
                 is3d={is3d}
@@ -64,6 +61,13 @@ export default function Node(){
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+            />
+             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
+
+            <InfoBox
+                graphData={graphData}
+                focusNode={focusNode}
+                setFocusNode={setFocusNode}
             />
             
             </div>

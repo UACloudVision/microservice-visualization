@@ -181,9 +181,31 @@ const Graph: React.FC<Props> = ({
                     trackNodes,
                     focusNode
                 );
+                let func;
+               
+                if (node["nodeType"] === "SERVICE"){
+                    func = new THREE.SphereGeometry(10);
 
+                }
+                else if (node["nodeType"] === "CONTROLLER"){
+                    func = new THREE.BoxGeometry(15, 15, 15);
+
+                }
+                 else if (node["nodeType"] === "REPOSITORY"){
+                        func = new THREE.ConeGeometry(10, 15);
+
+                }
+                else if (node["nodeType"] === "ENTITY"){
+                        func = new THREE.CylinderGeometry(10, 10, 15);
+                    }
+
+                
+                else{
+                    func = new THREE.SphereGeometry(5)
+                }
+                
                 const nodes = new THREE.Mesh(
-                    new THREE.SphereGeometry(5),
+                    func,
                     new THREE.MeshLambertMaterial({
                         transparent: true,
                         color: color,
@@ -195,6 +217,7 @@ const Graph: React.FC<Props> = ({
                         ),
                     })
                 );
+                
                 const sprite = new SpriteText(node.nodeName);
                 sprite.material.depthWrite = false;
 

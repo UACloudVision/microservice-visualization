@@ -15,7 +15,7 @@ export default function getData(nodes_array){
         if (nodes_array == undefined || nodes_array.includes(nodeName)){
             nodes.push({
                 "nodeName": nodeName,
-                "nodeType": "service"
+                "nodeType": "microservice"
             });
 
         }
@@ -42,6 +42,7 @@ export default function getData(nodes_array){
                         "parameters": parameters,
                         "returnType": returnType,
                         "methodName": methodName,
+                        "className": method["className"],
                         "httpMethod": http,
                     }
 
@@ -50,6 +51,7 @@ export default function getData(nodes_array){
                     "microservice" : nodeName, 
                     "parameters": parameters,
                     "returnType": returnType,
+                    "className": method["className"],
                     "methodName": methodName,
                     "httpMethod": http,
                 }
@@ -59,7 +61,7 @@ export default function getData(nodes_array){
     }
    
 }
-console.log(methods);
+
 let connections = [];
 let links = [];
     // array can be controller or service
@@ -81,12 +83,19 @@ let links = [];
                 }
                 
                 let http = methodCall["httpMethod"];
-                let className = methodCall["AdminOrderServiceImpl"];
+                let className;
+            if (arr["implementedTypes"].length == 1){ 
+                className = arr["implementedTypes"][0];
+
+            }
+            else{
+                className = arr["name"];
+            }
                 let calledFrom = methodCall["calledFrom"];
                 let destination = methods[url]["microservice"];
                 let source = methodCall["microserviceName"];
+                let parameters = methodCall["parameterContents"];
                 let name = source.concat(" --> ", destination);
-                let link = [methods[methodCall["calledFrom"]], methodCall["microserviceName"]]
                 if (source != destination){
                     // Check if this connection is already in 
                     // connections array
@@ -99,10 +108,12 @@ let links = [];
                                 "requests": [
                                   {
                                     "destinationUrl": url,
-                                    "sourceMethod": calledFrom, 
+                                    "sourceMethod": calledFrom,
+                                    "endpointFunction": methodCall["name"],
                                     "className": className,
+                                    "destinationclassName": methods[url]["className"],
                                     "type": http,
-                                    "argument": methods[url]["parameters"],
+                                    "argument": parameters,
                                     "msReturn": methods[url]["returnType"],
                                   }
                                 ],
@@ -119,10 +130,13 @@ let links = [];
                         // the "requests" parameter
                         links[connections.indexOf(name)]["requests"].push(
                             {
-                                "sourceMethod": calledFrom, 
-                                "destinationMethod": methodCall["name"],
-                                "type": methods[url]["httpMethod"],
-                                "argument": methods[url]["parameters"],
+                                "destinationUrl": url,
+                                "sourceMethod": calledFrom,
+                                "endpointFunction": methodCall["name"],
+                                "className": className,
+                                "destinationclassName": methods[url]["className"],
+                                "type": http,
+                                "argument": parameters,
                                 "msReturn": methods[url]["returnType"],
                               }
     
@@ -148,6 +162,7 @@ for (let i=0; i<microservices.length;i++){
     iterateThrough(controllers);
     
 }
+
     return {
         "graphName": "msgraph",
         "nodes": nodes, 
