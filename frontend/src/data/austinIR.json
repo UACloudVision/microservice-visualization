@@ -1,0 +1,117 @@
+{
+    "name": "Austin-train",
+    "commitID": "1",
+    "microservices" : [
+        {
+            "name": "ts-admin-basic-info-service",
+            "path": "/ts-admin-basic-info-service",
+            "controllers": [
+                {
+                    "methods": [    
+                    ],
+                    "methodCalls": [
+                    ]
+                }        
+            ],
+            "entities": [],
+            "feignClients": [],
+            "services": [
+                {
+                    "packageName": "adminbasic.service",
+                    "implementedTypes": [
+                        "AdminBasicInfoService"
+                    ],
+                    "classRole": "SERVICE",
+                    "methods" : [
+                    ],
+                    "fields": [
+ 
+                    ],
+                    "annotations" : [
+ 
+                    ],
+                    "methodCalls": [
+                        {
+                            "url": "/api/v1/contactservice/contacts",
+                            "httpMethod": "GET",
+                            "objectName": "restTemplate",
+                            "objectType": "RestTemplate",
+                            "calledFrom": "getAllContacts",
+                            "parameterContents": "contacts_service_url + \"/api/v1/contactservice/contacts\",HttpMethod.GET,requestEntity,Response.class",
+                            "microserviceName": "ts-admin-basic-info-service",
+                            "className": "AdminBasicInfoServiceImpl",
+                            "name": "exchange",
+                            "packageAndClassName": "adminbasic.service.AdminBasicInfoServiceImpl"
+                        }
+                    ]
+                }
+            ],
+            "repositories": [],
+            "files": [
+ 
+            ]
+        },
+        {
+            "name": "ts-contacts-service",
+            "path": "/ts-contacts-service",
+            "controllers": [
+                {
+                    "packageName": "contacts.controller",
+                    "implementedTypes": [],
+                    "classRole": "CONTROLLER",
+                    "methods": [
+                    {
+                        "url": "/api/v1/contactservice/contacts",
+                        "httpMethod": "GET",
+                        "parameters": [
+                        {
+                            "type": "HttpHeaders",
+                            "annotations": [
+                            {
+                                "attributes": {},
+                                "name": "RequestHeader",
+                                "packageAndClassName": "contacts.controller.ContactsController"
+                            }
+                            ],
+                            "name": "headers",
+                            "packageAndClassName": "contacts.controller.ContactsController"
+                        }
+                        ],
+                        "returnType": "HttpEntity",
+                        "microserviceName": "ts-contacts-service",
+                        "annotations": [
+                        {
+                            "attributes": {
+                            "origins": "*"
+                            },
+                            "name": "CrossOrigin",
+                            "packageAndClassName": "contacts.controller.ContactsController"
+                        },
+                        {
+                            "attributes": {
+                            "path": "/contacts"
+                            },
+                            "name": "GetMapping",
+                            "packageAndClassName": "contacts.controller.ContactsController"
+                        }
+                        ],
+                        "className": "ContactsController",
+                        "name": "getAllContacts",
+                        "packageAndClassName": "contacts.controller.ContactsController"
+                    }
+                    ],
+                    "methodCalls": []
+                }
+            ],
+            "services": [
+                {
+                    "packageName": "contacts.service",
+                    "implementedTypes": [],
+                    "classRole": "SERVICE",
+                    "methods": [],
+                    "methodCalls": []
+                }
+            ]
+        }
+    ]
+}
