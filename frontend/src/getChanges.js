@@ -136,7 +136,7 @@ function getChanges(myData, nodes_array) {
 
     for (let i=0; i<microservices.length;i++){
         let microservice = microservices[i];
-        // let nodeName = microservice["name"];
+        let nodeName = microservice["name"];
 
         // if (!(nodes_array == undefined) && !(nodes_array.includes(nodeName))){
         //     continue;
