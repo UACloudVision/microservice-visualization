@@ -259,9 +259,9 @@ const findModifications = (linkA, linkB) => {
     
 };
 
-export default function compareChanges() {
-    const file1 = JSON.parse(fs.readFileSync("./data/IR2_57b3.json", 'utf-8'));
-    const file2 = JSON.parse(fs.readFileSync("./data/IR3_3ea1.json", 'utf-8'));
+export default function compareChanges(filePath1, filePath2) {
+    const file1 = JSON.parse(fs.readFileSync(filePath1));            //("./data/IR2_57b3.json", 'utf-8'));
+    const file2 = JSON.parse(fs.readFileSync(filePath2));            //("./data/IR3_3ea1.json", 'utf-8'));
     const commitLink1 = getChanges(file1)['links'];
     const commitLink2 = getChanges(file2)['links'];
 
@@ -271,4 +271,4 @@ export default function compareChanges() {
     return modifications;
 }
 
-compareChanges();
+//compareChanges();
