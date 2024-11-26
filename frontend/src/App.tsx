@@ -45,7 +45,7 @@ function App(data: any) {
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
-    const [focusNode, setFocusNode] = useState();
+    const [focusNode, setFocusNode] = useState();   
 
     // For using backend
     //useEffect(() => {
@@ -59,7 +59,8 @@ function App(data: any) {
 
         //getGraphLifespan();
     //}, [graphName]);
-
+    
+    console.log(data["data"]);
     useEffect(() => {
         const fetchData = async () => {
             try {
