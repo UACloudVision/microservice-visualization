@@ -3,7 +3,7 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
-import myData from "./data/IR 1.json";
+// import myData from "./data/IR 1.json";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
@@ -16,6 +16,10 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 
+import commit1 from './data/IR2_57b3.json';
+import commit2 from './data/IR3_3ea1.json';
+import commit3 from './data/IR319_350f.json';
+import getChanges from "./getChanges.js";
 
 function App(data: any) {
     const graphRef = useRef();
@@ -23,7 +27,7 @@ function App(data: any) {
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(myData);
+    const [graphData, setGraphData] = useState(commit1);            //Check this
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -36,11 +40,9 @@ function App(data: any) {
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
-    const [focusNode, setFocusNode] = useState();
+    const [focusNode, setFocusNode] = useState();   
 
    
-    
-
     //useEffect(() => {
         //const getGraphLifespan = async () => {
             //const graphLifespan = await axios.get(`/graph/${graphName}`);
@@ -52,12 +54,14 @@ function App(data: any) {
 
         //getGraphLifespan();
     //}, [graphName]);
+    
     console.log(data["data"]);
     useEffect(() => {
         const getGraphLifespan = async () => {
-            
-           
-            setGraphTimeline([myData]);
+            console.log("commit 3:");
+            console.log(commit3);
+
+            setGraphTimeline([data["data"], data["data"], commit3]);     //HERE is how to manage the timeline
             setGraphData(data["data"]);
             setCurrentInstance(0);
         };

@@ -19,6 +19,7 @@ const TimeSlider: React.FC<Props> = ({
     const [value, setValue] = useState(0);
 
     const handleChange = (e: any) => {
+        console.log(e.target.value);
         setValue(e.target.value);
         setCurrentInstance(parseInt(e.target.value));
         setGraphData(graphTimeline[e.target.value]);
