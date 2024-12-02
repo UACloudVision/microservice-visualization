@@ -31,6 +31,9 @@ console.log(commit1Data);
 console.log(commit2Data);
 console.log(commit3Data);
 
+const Commit1to2Changes = compareChanges(commit1, commit2);
+const Commit2to3Changes = compareChanges(commit2, commit3);
+
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
@@ -68,7 +71,7 @@ function App(data: any) {
     useEffect(() => {
         const getGraphLifespan = async () => {
             setGraphTimeline([commit1Data, commit2Data, commit3Data]);     //HERE is how to manage the timeline
-            setGraphData(commit1Data);
+            setGraphData(commit1Data);      //FIXME sometimes null - but works fine
             console.log(data["data"]);
             console.log(commit1);
             setCurrentInstance(0);
