@@ -60,7 +60,6 @@ function App(data: any) {
         //getGraphLifespan();
     //}, [graphName]);
     
-    console.log(data["data"]);
     useEffect(() => {
         const fetchData = async () => {
             try {
