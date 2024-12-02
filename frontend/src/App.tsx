@@ -3,7 +3,7 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
-import myData from "./data/IR 1.json";
+// import myData from "./data/IR 1.json";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
@@ -16,6 +16,23 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 
+import getData from "./getData";
+import compareChanges from "./getChanges.js";
+
+import commit1 from './data/IR2_57b3.json';
+import commit2 from './data/IR3_3ea1.json';
+import commit3 from './data/IR319_350f.json';
+
+const commit1Data = getData(commit1, undefined);
+const commit2Data = getData(commit2, undefined);
+const commit3Data = getData(commit3, undefined);
+
+console.log(commit1Data);
+console.log(commit2Data);
+console.log(commit3Data);
+
+const Commit1to2Changes = compareChanges(commit1, commit2);
+const Commit2to3Changes = compareChanges(commit2, commit3);
 
 function App(data: any) {
     const graphRef = useRef();
@@ -23,7 +40,7 @@ function App(data: any) {
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(myData);
+    const [graphData, setGraphData] = useState(commit1);            //Check this
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -31,16 +48,15 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
+    const [trackChanges, setTrackChanges] = useState(false);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
-    const [focusNode, setFocusNode] = useState();
+    const [focusNode, setFocusNode] = useState();   
 
    
-    
-
     //useEffect(() => {
         //const getGraphLifespan = async () => {
             //const graphLifespan = await axios.get(`/graph/${graphName}`);
@@ -52,19 +68,20 @@ function App(data: any) {
 
         //getGraphLifespan();
     //}, [graphName]);
-    console.log(data["data"]);
+    
     useEffect(() => {
         const getGraphLifespan = async () => {
-            
-           
-            setGraphTimeline([myData]);
-            setGraphData(data["data"]);
+            setGraphTimeline([commit1Data, commit2Data, commit3Data]);     //HERE is how to manage the timeline
+            setGraphData(commit1Data);      //FIXME sometimes null - but works fine
+            console.log(data["data"]);
+            console.log(commit1);
             setCurrentInstance(0);
         };
 
         getGraphLifespan();
     }, [graphName]);
-   
+
+
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         //Ideally just return a prompt to upload a file or use some default file
         return null;
@@ -118,6 +135,8 @@ function App(data: any) {
                 setIs3d={setIs3d}
                 isDark={isDark}
                 setIsDark={setIsDark}
+                trackChanges={trackChanges}
+                setTrackChanges={setTrackChanges}
                 antiPattern={antiPattern}
                 selectedAntiPattern={selectedAntiPattern}
             />
