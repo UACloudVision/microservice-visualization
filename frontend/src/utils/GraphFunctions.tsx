@@ -438,46 +438,73 @@ function getLinkColor(
     antiPattern: any,
     threed: any,
     selectedAntiPattern: any,
-    focusNode: any
-) {
-    if (
-        link.source.nodeName === hoverNode ||
-        (focusNode && link.source.nodeName === focusNode.node)
-    ) {
-        return LINK_FROM_HOVER;
-    } else if (
-        link.target.nodeName === hoverNode ||
-        (focusNode && link.source.nodeName === focusNode.node)
-    ) {
-        return LINK_TO_HOVER;
-    }
-
-    if (antiPattern) {
-        if (selectedAntiPattern == "coupling") {
-            return `rgba(102,102,153, ${getLinkOpacity(
+    focusNode: any,
+    showChanges: any)
+{  
+//If the changes are shown then color each link depending on if it was added subtracted or deleted 
+    if (showChanges) {
+        if (link.type == 'addition') {
+            return `rgba(59, 217, 50,${getLinkOpacity(
                 link,
                 search,
                 threed,
                 focusNode
             )})`;
-        } else if (selectedAntiPattern == "Cyclic Dependency") {
-            if (linkInAntiPattern(link, selectedAntiPattern)) {
-                const color = IN_PATTERN.replace(`)`, `,0.99)`).replace(
-                    "rgb",
-                    "rgba"
-                );
-
-                return color;
+        } else if (link.type == 'subtraction') {
+            return `rgba(217, 59, 50,${getLinkOpacity(
+                link,
+                search,
+                threed,
+                focusNode
+            )})`;
+        } else {
+            return `rgba(150,150,150,${getLinkOpacity(
+                link,
+                search,
+                threed,
+                focusNode
+            )})`;
+        }
+    } else {
+        if (
+            link.source.nodeName === hoverNode ||
+            (focusNode && link.source.nodeName === focusNode.node)
+        ) {
+            return LINK_FROM_HOVER;
+        } else if (
+            link.target.nodeName === hoverNode ||
+            (focusNode && link.source.nodeName === focusNode.node)
+        ) {
+            return LINK_TO_HOVER;
+        }
+    
+        if (antiPattern) {
+            if (selectedAntiPattern == "coupling") {
+                return `rgba(102,102,153, ${getLinkOpacity(
+                    link,
+                    search,
+                    threed,
+                    focusNode
+                )})`;
+            } else if (selectedAntiPattern == "Cyclic Dependency") {
+                if (linkInAntiPattern(link, selectedAntiPattern)) {
+                    const color = IN_PATTERN.replace(`)`, `,0.99)`).replace(
+                        "rgb",
+                        "rgba"
+                    );
+    
+                    return color;
+                }
             }
         }
+    
+        return `rgba(150,150,150,${getLinkOpacity(
+            link,
+            search,
+            threed,
+            focusNode
+        )})`;
     }
-
-    return `rgba(150,150,150,${getLinkOpacity(
-        link,
-        search,
-        threed,
-        focusNode
-    )})`;
 }
 
 function linkColorAsSourceNodeColor(

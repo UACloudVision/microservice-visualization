@@ -1,6 +1,4 @@
 import fs from 'fs';
-import { diffLines } from 'diff';
-import colors from 'colors';
 
 function getChanges(myData) {
     let microservices = myData["microservices"];
@@ -270,5 +268,3 @@ export default function compareChanges() {
 
     return modifications;
 }
-
-compareChanges();
