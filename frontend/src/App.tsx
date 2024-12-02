@@ -16,10 +16,20 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 
+import getData from "./getData";
+import compareChanges from "./getChanges.js";
+
 import commit1 from './data/IR2_57b3.json';
 import commit2 from './data/IR3_3ea1.json';
 import commit3 from './data/IR319_350f.json';
-import getChanges from "./getChanges.js";
+
+const commit1Data = getData(commit1, undefined);
+const commit2Data = getData(commit2, undefined);
+const commit3Data = getData(commit3, undefined);
+
+console.log(commit1Data);
+console.log(commit2Data);
+console.log(commit3Data);
 
 function App(data: any) {
     const graphRef = useRef();
@@ -55,20 +65,19 @@ function App(data: any) {
         //getGraphLifespan();
     //}, [graphName]);
     
-    console.log(data["data"]);
     useEffect(() => {
         const getGraphLifespan = async () => {
-            console.log("commit 3:");
-            console.log(commit3);
-
-            setGraphTimeline([data["data"], data["data"], commit3]);     //HERE is how to manage the timeline
-            setGraphData(data["data"]);
+            setGraphTimeline([commit1Data, commit2Data, commit3Data]);     //HERE is how to manage the timeline
+            setGraphData(commit1Data);
+            console.log(data["data"]);
+            console.log(commit1);
             setCurrentInstance(0);
         };
 
         getGraphLifespan();
     }, [graphName]);
-   
+
+
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         //Ideally just return a prompt to upload a file or use some default file
         return null;
