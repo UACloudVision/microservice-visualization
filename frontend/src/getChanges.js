@@ -1,8 +1,8 @@
-import fs from 'fs';
-import { diffLines } from 'diff';
-import colors from 'colors';
+// import fs from 'fs';
+// import { diffLines } from 'diff';
+// import colors from 'colors';
 
-function getChanges(myData) {
+function getChanges(myData, nodes_array) {
     let microservices = myData["microservices"];
     let nodes = [];
     let methods = {};
@@ -259,11 +259,11 @@ const findModifications = (linkA, linkB) => {
     
 };
 
-export default function compareChanges(filePath1, filePath2) {
-    const file1 = JSON.parse(fs.readFileSync(filePath1));            //("./data/IR2_57b3.json", 'utf-8'));
-    const file2 = JSON.parse(fs.readFileSync(filePath2));            //("./data/IR3_3ea1.json", 'utf-8'));
-    const commitLink1 = getChanges(file1)['links'];
-    const commitLink2 = getChanges(file2)['links'];
+export default function compareChanges(commit1, commit2) {
+    // const file1 = JSON.parse(fs.readFileSync(filePath1));            //("./data/IR2_57b3.json", 'utf-8'));
+    // const file2 = JSON.parse(fs.readFileSync(filePath2));            //("./data/IR3_3ea1.json", 'utf-8'));
+    const commitLink1 = getChanges(commit1)['links'];
+    const commitLink2 = getChanges(commit2)['links'];
 
     //Need to find subtractions and additions in the requests of 
     const modifications = findModifications(commitLink1, commitLink2);
