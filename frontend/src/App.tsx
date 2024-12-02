@@ -25,6 +25,9 @@ import compareChanges from "./getChanges.js";
 
 import files from './data/input.json';
 
+const Commit1to2Changes = compareChanges(commit1, commit2);
+const Commit2to3Changes = compareChanges(commit2, commit3);
+
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");

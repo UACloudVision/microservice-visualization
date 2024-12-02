@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+// import fs from 'fs';
+// import { diffLines } from 'diff';
+// import colors from 'colors';
+
+>>>>>>> 9e2e860 (fix: fixed imports so compareChanges works)
 function getChanges(myData, nodes_array) {
     let microservices = myData["microservices"];
     let nodes = [];
