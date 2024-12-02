@@ -48,6 +48,7 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
+    const [trackChanges, setTrackChanges] = useState(false);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
@@ -134,6 +135,8 @@ function App(data: any) {
                 setIs3d={setIs3d}
                 isDark={isDark}
                 setIsDark={setIsDark}
+                trackChanges={trackChanges}
+                setTrackChanges={setTrackChanges}
                 antiPattern={antiPattern}
                 selectedAntiPattern={selectedAntiPattern}
             />

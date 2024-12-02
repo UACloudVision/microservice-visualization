@@ -163,6 +163,6 @@ export default function getData(myData, nodes_array){
         "graphName": "msgraph",
         "nodes": nodes, 
         "links": links, 
-        "gitCommitId": "0"
+        "gitCommitId": myData["commitID"]
     };
 }
