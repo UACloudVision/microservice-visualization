@@ -120,7 +120,9 @@ export default function FilterBox(values){
       //data["graphData"] = temp;
       //console.log(data);
       let connections = getConnections(nodes, data["links"]);
+      console.log("Connection:");
       console.log(connections);
+      console.log("Data:");
       console.log(data);
       navigate('/node', {state: JSON.stringify(connections)});
 

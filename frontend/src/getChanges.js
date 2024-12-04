@@ -340,5 +340,3 @@ export default function compareChanges(commit1, commit2) {
 
     return modifications;
 }
-
-//compareChanges();
