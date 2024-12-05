@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 function getChanges(myData, nodes_array) {
     let microservices = myData["microservices"];
     let nodes = [];

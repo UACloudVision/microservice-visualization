@@ -48,7 +48,7 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
-    const [trackChanges, setTrackChanges] = useState(false);
+    const [trackChanges, setTrackChanges] = useState(true);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
@@ -71,7 +71,7 @@ function App(data: any) {
     
     useEffect(() => {
         const getGraphLifespan = async () => {
-            setGraphTimeline([commit1Data, commit2Data, commit3Data]);     //HERE is how to manage the timeline
+            setGraphTimeline([commit1Data, Commit1to2Changes, Commit2to3Changes]);     //HERE is how to manage the timeline
             setGraphData(commit1Data);      //FIXME sometimes null - but works fine
             console.log(data["data"]);
             console.log(commit1);
@@ -160,6 +160,7 @@ function App(data: any) {
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+                trackChanges={trackChanges}
             />
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 
