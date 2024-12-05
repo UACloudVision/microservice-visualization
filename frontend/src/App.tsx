@@ -23,17 +23,6 @@ import commit1 from './data/IR2_57b3.json';
 import commit2 from './data/IR3_3ea1.json';
 import commit3 from './data/IR319_350f.json';
 
-const commit1Data = getData(commit1, undefined);
-const commit2Data = getData(commit2, undefined);
-const commit3Data = getData(commit3, undefined);
-
-console.log(commit1Data);
-console.log(commit2Data);
-console.log(commit3Data);
-
-const Commit1to2Changes = compareChanges(commit1, commit2);
-const Commit2to3Changes = compareChanges(commit2, commit3);
-
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
@@ -71,10 +60,9 @@ function App(data: any) {
     
     useEffect(() => {
         const getGraphLifespan = async () => {
-            setGraphTimeline([commit1Data, Commit1to2Changes, Commit2to3Changes]);     //HERE is how to manage the timeline
-            setGraphData(commit1Data);      //FIXME sometimes null - but works fine
-            console.log(data["data"]);
-            console.log(commit1);
+            setGraphTimeline([commit1, commit2, commit3]);     //HERE is how to manage the timeline
+            setGraphData(getData(commit1, undefined)); //FIXME sometimes null - but works fine
+             
             setCurrentInstance(0);
         };
 
@@ -86,7 +74,6 @@ function App(data: any) {
         //Ideally just return a prompt to upload a file or use some default file
         return null;
     }
-    console.log(graphRef);
     return (
        <BrowserRouter >
         <Routes>
@@ -139,6 +126,8 @@ function App(data: any) {
                 setTrackChanges={setTrackChanges}
                 antiPattern={antiPattern}
                 selectedAntiPattern={selectedAntiPattern}
+                currentInstance={currentInstance}
+                graphTimeline={graphTimeline}
             />
             {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
             <GraphWrapper
@@ -192,6 +181,7 @@ function App(data: any) {
                     currentInstance={currentInstance}
                     setCurrentInstance={setCurrentInstance}
                     setDefNodeColor={setDefNodeColor}
+                    trackChanges={trackChanges}
                 />
             </div>
             <TrackNodeMenu

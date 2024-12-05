@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import compareChanges from "../../getChanges";
+import getData from "../../getData";
 
 type Props = {
     max: number;
@@ -7,6 +9,7 @@ type Props = {
     currentInstance: any;
     setCurrentInstance: any;
     setDefNodeColor: any;
+    trackChanges: any;
 };
 const TimeSlider: React.FC<Props> = ({
     max,
@@ -15,6 +18,7 @@ const TimeSlider: React.FC<Props> = ({
     currentInstance,
     setCurrentInstance,
     setDefNodeColor,
+    trackChanges,
 }) => {
     const [value, setValue] = useState(0);
 
@@ -22,7 +26,16 @@ const TimeSlider: React.FC<Props> = ({
         console.log(e.target.value);
         setValue(e.target.value);
         setCurrentInstance(parseInt(e.target.value));
-        setGraphData(graphTimeline[e.target.value]);
+        if (trackChanges && (currentInstance != 0)) {
+            console.log("SHOW CHANGE DATA")
+            console.log(graphTimeline[e.target.value - 1])
+            console.log(graphTimeline[e.target.value])
+            setGraphData(compareChanges(graphTimeline[e.target.value - 1], graphTimeline[e.target.value]))
+        } else {
+            console.log("SHOW SINGLE DATA")
+            setGraphData(getData(graphTimeline[e.target.value]));
+        }
+        
         setDefNodeColor(false);
     };
     return (
@@ -49,7 +62,7 @@ const TimeSlider: React.FC<Props> = ({
                         Iteration {value}
                     </div>
                     <div>
-                        Commit #{graphTimeline[currentInstance].gitCommitId}
+                        Commit #{graphTimeline[currentInstance].commitID}
                     </div>
                     <div>
                         Created {graphTimeline[currentInstance].createDate}
