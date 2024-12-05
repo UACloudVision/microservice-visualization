@@ -183,7 +183,8 @@ const Graph: React.FC<Props> = ({
                     colorMode,
                     selectedAntiPattern,
                     trackNodes,
-                    focusNode
+                    focusNode,
+                    trackChanges
                 );
                 
                 let func;

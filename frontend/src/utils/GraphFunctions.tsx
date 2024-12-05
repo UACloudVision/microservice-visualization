@@ -67,7 +67,8 @@ function getColor(
     colorMode: any,
     selectedAntiPattern: any,
     trackNodes: any,
-    focusNode: any
+    focusNode: any,
+    trackChanges: any,
 ): any {
     if (highlightNodes && highlightNodes.has(node.nodeName)) {
         if (node.nodeName === hoverNode) {
@@ -117,6 +118,16 @@ function getColor(
             case "High Coupling":
                 return getColorCoupling(node, graphData, threshold);
             // default just continue into visual color scheme (based on theme)
+        }
+    }
+
+    if (trackChanges) {
+        if (node.color == 'green') {
+            return `rgba(0, 255, 0,1)`;
+        } else if (node.color == 'red') {
+            return `rgba(255, 0, 0,1)`;
+        } else if (node.color == 'yellow'){
+            return `rgba(255, 115, 0,1)`;
         }
     }
 
@@ -377,7 +388,8 @@ function getSpriteColor(
     colorMode: any,
     selectedAntiPattern: any,
     trackNodes: any,
-    focusNode: any
+    focusNode: any,
+    trackChanges: any,
 ) {
     return getColor(
         node,
@@ -391,7 +403,8 @@ function getSpriteColor(
         colorMode,
         selectedAntiPattern,
         trackNodes,
-        focusNode
+        focusNode,
+        trackChanges
     );
 }
 
@@ -479,18 +492,11 @@ function getLinkColor(
 
     if (showChanges) {
         if (link.color == 'green') {
-            return `rgba(59, 217, 50,1)`;
+            return `rgba(0, 255, 0,1)`;
         } else if (link.color == 'red') {
-            return `rgba(217, 59, 50,1)`;
+            return `rgba(255, 0, 0,1)`;
         } else if (link.color == 'yellow'){
-            return `rgba(237,233,104,1)`;
-        } else {
-            return `rgba(150,150,150,${getLinkOpacity(
-                link,
-                search,
-                threed,
-                focusNode
-            )})`;
+            return `rgba(255, 115, 0,1)`;
         }
     }
 

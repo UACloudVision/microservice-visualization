@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import GraphButtonMenu from "./GraphButtons";
 import Search from "./Search";
+import getData from "../../getData";
+import compareChanges from "../../getChanges";
 
 type Props = {
     graphRef: any;
@@ -20,7 +22,9 @@ type Props = {
     setTrackChanges: React.Dispatch<React.SetStateAction<boolean>>;
     antiPattern: boolean;
     selectedAntiPattern: string;
-};
+    currentInstance: any;
+    graphTimeline: any;
+}
 
 /**
  * A menu to be able to do all sorts of things with the force graph.
@@ -47,6 +51,8 @@ const GraphMenu: React.FC<Props> = ({
     setTrackChanges,
     antiPattern,
     selectedAntiPattern,
+    currentInstance,
+    graphTimeline
 }) => {
     return (
         <div className="absolute top-2 right-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-44">
@@ -88,7 +94,18 @@ const GraphMenu: React.FC<Props> = ({
                     defaultChecked={trackChanges}
                     className="sr-only peer"
                     onClick={() => {
-                        setTrackChanges(!trackChanges);
+                        let newTrackChanges = !trackChanges;
+                        setTrackChanges(newTrackChanges);
+                        console.log(trackChanges)
+                        if (newTrackChanges && (currentInstance != 0)) { //Thuis should be checking when trackChanges is true but the setTrackChanges takes too long to update the variable
+                            console.log("SHOW CHANGE DATA")
+                            console.log(graphTimeline[currentInstance - 1])
+                            console.log(graphTimeline[currentInstance])
+                            setGraphData(compareChanges(graphTimeline[currentInstance - 1], graphTimeline[currentInstance]))
+                        } else {
+                            console.log("SHOW SINGLE DATA")
+                            setGraphData(getData(graphTimeline[currentInstance]));
+                        }
                     }}
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
