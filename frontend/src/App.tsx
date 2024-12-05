@@ -23,11 +23,14 @@ import compareChanges from "./getChanges.js";
 // import commit2 from './data/IR3_3ea1.json';
 // import commit3 from './data/IR319_350f.json';
 
+<<<<<<< HEAD
 import files from './data/input.json';
 
 const Commit1to2Changes = compareChanges(commit1, commit2);
 const Commit2to3Changes = compareChanges(commit2, commit3);
 
+=======
+>>>>>>> 0dcab36 (Added colors to links and node, added dynamic graph display to the timeline, and added a change button where you can see the changes betwee two commits)
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
