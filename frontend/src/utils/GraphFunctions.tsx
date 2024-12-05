@@ -11,7 +11,7 @@ const DARK_GRAY = "rgb(50,50,50)";
 
 const IN_PATTERN = "rgb(235,52,192)";
 
-const LINK_FROM_HOVER = "rgba(232, 190, 39,1)";
+const LINK_FROM_HOVER = "rgba(52, 143, 235,1)";
 const LINK_TO_HOVER = "rgba(179, 66, 245,1)";
 
 function getShape(type: String): number {
@@ -445,21 +445,45 @@ function getLinkColor(
     showChanges: any)
 {  
 //If the changes are shown then color each link depending on if it was added subtracted or deleted 
+    if (
+        link.source.nodeName === hoverNode ||
+        (focusNode && link.source.nodeName === focusNode.node)
+    ) {
+        return LINK_FROM_HOVER;
+    } else if (
+        link.target.nodeName === hoverNode ||
+        (focusNode && link.source.nodeName === focusNode.node)
+    ) {
+        return LINK_TO_HOVER;
+    }
+
+    if (antiPattern) {
+        if (selectedAntiPattern == "coupling") {
+            return `rgba(102,102,153, ${getLinkOpacity(
+                link,
+                search,
+                threed,
+                focusNode
+            )})`;
+        } else if (selectedAntiPattern == "Cyclic Dependency") {
+            if (linkInAntiPattern(link, selectedAntiPattern)) {
+                const color = IN_PATTERN.replace(`)`, `,0.99)`).replace(
+                    "rgb",
+                    "rgba"
+                );
+
+                return color;
+            }
+        }
+    }
+
     if (showChanges) {
-        if (link.type == 'addition') {
-            return `rgba(59, 217, 50,${getLinkOpacity(
-                link,
-                search,
-                threed,
-                focusNode
-            )})`;
-        } else if (link.type == 'subtraction') {
-            return `rgba(217, 59, 50,${getLinkOpacity(
-                link,
-                search,
-                threed,
-                focusNode
-            )})`;
+        if (link.color == 'green') {
+            return `rgba(59, 217, 50,1)`;
+        } else if (link.color == 'red') {
+            return `rgba(217, 59, 50,1)`;
+        } else if (link.color == 'yellow'){
+            return `rgba(237,233,104,1)`;
         } else {
             return `rgba(150,150,150,${getLinkOpacity(
                 link,
@@ -468,46 +492,14 @@ function getLinkColor(
                 focusNode
             )})`;
         }
-    } else {
-        if (
-            link.source.nodeName === hoverNode ||
-            (focusNode && link.source.nodeName === focusNode.node)
-        ) {
-            return LINK_FROM_HOVER;
-        } else if (
-            link.target.nodeName === hoverNode ||
-            (focusNode && link.source.nodeName === focusNode.node)
-        ) {
-            return LINK_TO_HOVER;
-        }
-    
-        if (antiPattern) {
-            if (selectedAntiPattern == "coupling") {
-                return `rgba(102,102,153, ${getLinkOpacity(
-                    link,
-                    search,
-                    threed,
-                    focusNode
-                )})`;
-            } else if (selectedAntiPattern == "Cyclic Dependency") {
-                if (linkInAntiPattern(link, selectedAntiPattern)) {
-                    const color = IN_PATTERN.replace(`)`, `,0.99)`).replace(
-                        "rgb",
-                        "rgba"
-                    );
-    
-                    return color;
-                }
-            }
-        }
-    
-        return `rgba(150,150,150,${getLinkOpacity(
-            link,
-            search,
-            threed,
-            focusNode
-        )})`;
     }
+
+    return `rgba(150,150,150,${getLinkOpacity(
+        link,
+        search,
+        threed,
+        focusNode
+    )})`;
 }
 
 function linkColorAsSourceNodeColor(
