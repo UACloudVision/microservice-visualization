@@ -21,7 +21,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <App data={graphData}/>
+        <App data={null}/>
     </React.StrictMode>
 );
 
