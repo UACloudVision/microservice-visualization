@@ -6,6 +6,8 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import { InfoBox } from "./components/graph/NodeInfoBox";
 import Menu from "./components/graph/RightClickNodeMenu";
+import * as THREE from "three";
+import ForceGraph3D from "react-force-graph-3d";
 
 import axios from "axios";
 
@@ -19,7 +21,7 @@ export default function Node(){
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(data);
+    const [graphData, setGraphData] = useState(data[0]);
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -33,7 +35,7 @@ export default function Node(){
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
-    console.log(data);
+    const microserviceColors = data[1];
     
     
         return (
@@ -69,7 +71,10 @@ export default function Node(){
                 focusNode={focusNode}
                 setFocusNode={setFocusNode}
             />
+            <Legend 
+            microservices={microserviceColors}
             
+            /> 
             </div>
             
         
@@ -77,3 +82,107 @@ export default function Node(){
         );
 
 }
+
+function Legend(microservices) {
+    let data = microservices["microservices"];
+    let sphere = {"nodes":[{"nodeName" : "Sphere", "type": "SERVICE"}], "links":[]};
+    
+    
+    return (
+    <div style={{
+      display: "flex",
+      overflow: "auto",
+      flexDirection: "column",      /* Stack elements vertically */
+      alignItems: "flex-end",       /* Align items to the right */
+      position: "absolute",
+      top: "20px",                 /* Distance from the top of the page */
+      right: "20px",                 /* Distance from the right of the page */
+      gap: "10px", 
+      font: "100px"
+    }}>
+    <div
+      style={{
+        fontSize:"20px",
+        padding: "10px",
+        backgroundColor: "lightblue",
+        border: "1px solid blue",
+        width: "300px",             /* Adjust width as needed */
+        maxHeight: "250px", 
+        textAlign: "center",
+      }}
+    >
+      <h3 style={{ margin: '0 0 10px' }}>Legend</h3>
+      <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+        <li>
+          Service: 
+          <ForceGraph3D
+            ref = {useRef()}
+            graphData={sphere}
+            width={50}
+            height={50}
+            backgroundColor={"rgba(255,255,255,255)"}
+            nodeThreeObject={() => {
+              const node = new THREE.Mesh(
+                new THREE.SphereGeometry(50),
+                new THREE.MeshLambertMaterial({
+                    color: 'rgb(0,0,0)',
+                })
+            );
+            return node;
+
+            }
+          }
+            >
+            
+          </ForceGraph3D>
+        </li>
+        <li>
+          Controller: Cube
+        </li>
+        <li>
+          Repistory: Cone
+        </li>
+        <li>
+          Entity: Cylinder
+        </li>
+        
+      </ul>
+    </div>
+    <div
+      style={{
+        fontSize:"20px",
+        padding: "10px",
+        backgroundColor: "lightblue",
+        border: "1px solid blue",
+        width: "300px", 
+        maxHeight: "250px",           
+        textAlign: "center",
+      }}
+  >
+    Microservice Legend
+    {Object.entries(data).map(([name, color], index) => (
+          <li
+            key={index}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '15px',
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-block',
+                width: '20px',
+                height: '20px',
+                backgroundColor: color,
+                marginRight: '10px',
+                border: '1px solid #000',
+              }}
+            ></span>
+            {name}
+          </li>
+        ))}
+  </div>
+  </div>
+  );
+};

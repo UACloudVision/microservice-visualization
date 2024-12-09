@@ -8,6 +8,7 @@ import myData from "./data/IR323_3138.json";
 import getConnections from "./createConnections.js"
 
 
+
 function getData(data){
     
   let microservices = data["microservices"];
@@ -79,22 +80,9 @@ export default function FilterBox(values){
     };
 
     function handleFilter(){
-
-      //const temp = {...graphData};
-      //let microservices = temp["nodes"];
-      //let nodes = []
-      //for (let i=0; i<microservices.length; i++ ){
-        //let microservice = microservices[i];
-        //if (selectedIds.includes(microservice["nodeName"])){
-          //nodes.push(microservice);
-        //}
-        //let temp = {...graphData}
         let microservices = graphData["nodes"];
-        //let links = graphData["links"];
-        //let temp_links = [];
         let nodes = [];
 
-       
         for (let i=0; i<microservices.length; i++ ){
             let microservice = microservices[i];
             if (selectedIds.includes(microservice["nodeName"])){
@@ -102,26 +90,13 @@ export default function FilterBox(values){
             }
             
         }
+        // Change this later
         let data = getGraphData(nodes);
 
-        //for (let i=0; i<links.length; i++){
-          //let link = links[i];
-          //let source = link["source"]["nodeName"];
-          //let target = link["target"]["nodeName"];
-          //if (selectedIds.includes(source) && selectedIds.includes(target)){
-            //temp_links.push(link)
-        //}
-      //}
-      //temp["nodes"] = nodes;
-      //temp["links"] = temp_links;
-
-      //const data = {...values};
-      //console.log(values);
-      //data["graphData"] = temp;
-      //console.log(data);
+        
       let connections = getConnections(nodes, data["links"]);
       console.log(connections);
-      console.log(data);
+  
       navigate('/node', {state: JSON.stringify(connections)});
 
     }

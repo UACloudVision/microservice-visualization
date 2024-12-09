@@ -141,6 +141,8 @@ const Graph: React.FC<Props> = ({
         },
         [graphRef]
     );
+    console.log(graphRef);
+    console.log(sharedProps.graphData);
 
     return (
         <ForceGraph3D
@@ -181,6 +183,7 @@ const Graph: React.FC<Props> = ({
                     trackNodes,
                     focusNode
                 );
+                
                 let func;
                
                 if (node["nodeType"] === "SERVICE"){
@@ -196,14 +199,11 @@ const Graph: React.FC<Props> = ({
 
                 }
                 else if (node["nodeType"] === "ENTITY"){
-                        func = new THREE.CylinderGeometry(10, 10, 15);
+                        func = new THREE.CylinderGeometry(10, 10, 20);
                     }
-
-                
                 else{
                     func = new THREE.SphereGeometry(5)
                 }
-                
                 const nodes = new THREE.Mesh(
                     func,
                     new THREE.MeshLambertMaterial({
@@ -303,6 +303,7 @@ const Graph: React.FC<Props> = ({
             }}
             backgroundColor={"rgba(0,0,0,0)"}
             onNodeClick={handleNodeClick}
+            onLinkClick={handleNodeClick}
             onNodeHover={handleNodeHover}
             onLinkHover={handleLinkHover}
             linkWidth={(link) =>

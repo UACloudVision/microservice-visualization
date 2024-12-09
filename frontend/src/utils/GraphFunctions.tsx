@@ -138,6 +138,9 @@ function getColorVisual(
     setDefNodeColor: any,
     colorMode: string
 ): ColorRepresentation {
+    if ("color" in node){
+        return "rgb".concat(node["color"]);
+    }
     switch (colorMode) {
         case "neighbor":
             let neighbors: any = getNeighbors(
