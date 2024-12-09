@@ -12,7 +12,7 @@ import commit1 from './data/IR2_57b3.json';
 setupLogger();
 setupAxios();
 let graphData = getData(commit1, undefined);
-console.log(graphData);
+// console.log(graphData);
 //const graphLifespan = axios.post(`/graph/create`, graphData);
 //console.log(graphLifespan);
 
