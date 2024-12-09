@@ -19,9 +19,11 @@ import NewPage from "./node.js";
 import getData from "./getData";
 import compareChanges from "./getChanges.js";
 
-import commit1 from './data/IR2_57b3.json';
-import commit2 from './data/IR3_3ea1.json';
-import commit3 from './data/IR319_350f.json';
+// import commit1 from './data/IR2_57b3.json';
+// import commit2 from './data/IR3_3ea1.json';
+// import commit3 from './data/IR319_350f.json';
+
+import files from './data/input.json';
 
 function App(data: any) {
     const graphRef = useRef();
@@ -29,7 +31,7 @@ function App(data: any) {
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(commit1);            //Check this
+    const [graphData, setGraphData] = useState<{ graphName: string; nodes: { nodeName: any; nodeType: string; }[]; links: any[]; gitCommitId: any; } | null>(null);
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -43,9 +45,9 @@ function App(data: any) {
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
-    const [focusNode, setFocusNode] = useState();   
+    const [focusNode, setFocusNode] = useState();
 
-   
+    // For using backend
     //useEffect(() => {
         //const getGraphLifespan = async () => {
             //const graphLifespan = await axios.get(`/graph/${graphName}`);
@@ -57,17 +59,50 @@ function App(data: any) {
 
         //getGraphLifespan();
     //}, [graphName]);
-    
+
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let temp: any = [];
+                for (const filePath of files["files"]) {
+                    const fileResponse = await fetch(filePath);
+                    const fileData = await fileResponse.json();
+                    console.log(fileData);
+                    // Call getData with the JSON content
+                    // check if a commit with that id already in it? Runs twice for some reason
+                    if (!temp.some((commit: any) => commit.commitID === fileData.commitID)) {
+                        temp.push(fileData);
+                    }
+                }
+                console.log(temp);
+                return temp;
+                // setCommits(temp);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
         const getGraphLifespan = async () => {
-            setGraphTimeline([commit1, commit2, commit3]);     //HERE is how to manage the timeline
-            setGraphData(getData(commit1, undefined)); //FIXME sometimes null - but works fine
-             
+            let commits = await fetchData();
+            console.log(commits);
+            setGraphTimeline(commits);     //HERE is how to manage the timeline
+            setGraphData(getData(commits[0], undefined));
             setCurrentInstance(0);
         };
 
         getGraphLifespan();
     }, [graphName]);
+
+    // For without the file as inputs of which commit to use
+    // useEffect(() => {
+    //     const getGraphLifespan = async () => {
+    //         setGraphTimeline([commit1, commit2, commit3]);     //HERE is how to manage the timeline
+    //         setGraphData(getData(commit1, undefined));
+    //         setCurrentInstance(0);
+    //     };
+
+    //     getGraphLifespan();
+    // }, [graphName]);
 
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {

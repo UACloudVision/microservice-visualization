@@ -26,7 +26,7 @@ const TimeSlider: React.FC<Props> = ({
         console.log(e.target.value);
         setValue(e.target.value);
         setCurrentInstance(parseInt(e.target.value));
-        if (trackChanges && (currentInstance != 0)) {
+        if (trackChanges && (e.target.value != 0)) {
             console.log("SHOW CHANGE DATA")
             console.log(graphTimeline[e.target.value - 1])
             console.log(graphTimeline[e.target.value])
