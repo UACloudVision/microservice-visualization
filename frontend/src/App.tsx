@@ -137,10 +137,8 @@ function App(data: any) {
             />
             
             <FilterBox
-                graphData={graphData}
-                
-            >
-            </FilterBox>
+                graphData={graphData} 
+            ></FilterBox>
             
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
