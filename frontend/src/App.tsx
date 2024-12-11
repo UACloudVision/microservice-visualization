@@ -35,7 +35,7 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
-    const [trackChanges, setTrackChanges] = useState(true);
+    const [trackChanges, setTrackChanges] = useState(false);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
@@ -133,9 +133,11 @@ function App(data: any) {
             />
             
             <FilterBox
+                key={`${currentInstance}-${trackChanges}`}
                 graphData={graphData} 
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
+                trackChanges={trackChanges}
             ></FilterBox>
             
             {/* Graph Menu on upper right with buttons */}
