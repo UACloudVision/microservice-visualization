@@ -123,11 +123,11 @@ function getColor(
 
     if (trackChanges) {
         if (node.color == 'green') {
-            return `rgba(0, 255, 0,1)`;
+            return "rgb(0, 255, 0)";
         } else if (node.color == 'red') {
-            return `rgba(255, 0, 0,1)`;
+            return "rgb(255, 0, 0)";
         } else if (node.color == 'yellow'){
-            return `rgba(255, 115, 0,1)`;
+            return "rgb(255, 115, 0)";
         }
     }
 

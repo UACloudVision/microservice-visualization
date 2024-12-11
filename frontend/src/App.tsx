@@ -35,7 +35,7 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
-    const [trackChanges, setTrackChanges] = useState(false);
+    const [trackChanges, setTrackChanges] = useState(true);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
