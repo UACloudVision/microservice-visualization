@@ -19,14 +19,7 @@ import NewPage from "./node.js";
 import getData from "./getData";
 import compareChanges from "./getChanges.js";
 
-// import commit1 from './data/IR2_57b3.json';
-// import commit2 from './data/IR3_3ea1.json';
-// import commit3 from './data/IR319_350f.json';
-
 import files from './data/input.json';
-
-const Commit1to2Changes = compareChanges(commit1, commit2);
-const Commit2to3Changes = compareChanges(commit2, commit3);
 
 function App(data: any) {
     const graphRef = useRef();
@@ -141,6 +134,8 @@ function App(data: any) {
             
             <FilterBox
                 graphData={graphData} 
+                currentInstance={currentInstance}
+                graphTimeline={graphTimeline}
             ></FilterBox>
             
             {/* Graph Menu on upper right with buttons */}

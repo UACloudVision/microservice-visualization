@@ -91,10 +91,10 @@ export default function FilterBox(values){
             
         }
         // Change this later
-        let data = getGraphData(nodes);
+        let data = getGraphData(values["graphTimeline"][values["currentInstance"]], nodes);
 
         
-      let connections = getConnections(nodes, data["links"]);
+      let connections = getConnections(values["graphTimeline"][values["currentInstance"]], nodes, data["links"], );
       console.log("Connection:");
       console.log(connections);
       console.log("Data:");

@@ -271,11 +271,11 @@ const findModifications = (linkA, linkB) => {
     to a dictionary of microservice links that have been added since the previous commit
     */
     for (let k of linkDifferences["linkAdditions"]) {
-        links.push({"name": k, ...linkB['links'][k], color: "green" });
+        links.push({"name": k, ...linkB['links'][k], color: "green", "type":"link" });
     }
 
     for (let k of linkDifferences["linkSubtractions"]) {
-        links.push({"name": k, ...linkA['links'][k], color: "red" });
+        links.push({"name": k, ...linkA['links'][k], color: "red", "type":"link" });
     }
 
     
@@ -285,10 +285,10 @@ const findModifications = (linkA, linkB) => {
         let requestDifferences = getRequestDifferences(requestsA, requestsB);
         // FIXME Needs some iterating though requestDifferences here to determine color and should set requests to requestsB
         if (requestDifferences["linkAdditions"].length == 0 && requestDifferences["linkSubtractions"] == 0) {
-            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB});
+            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB, "type":"link"});
         }
         else {
-            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB, "color": "yellow"});
+            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB, "color": "yellow", "type":"link"});
         }
     }
 
@@ -338,3 +338,4 @@ export default function compareChanges(commit1, commit2) {
 
     return modifications;
 }
+

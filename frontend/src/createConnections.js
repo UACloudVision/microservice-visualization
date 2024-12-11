@@ -1,8 +1,7 @@
 import React from "react"
-import myData from "./data/IR323_3138.json";
 
 
-export default function filterNodes(arrayOfNodes, linksArray){
+export default function filterNodes(myData, arrayOfNodes, linksArray){
     let microservices = myData["microservices"];
     let nodes = {};
     let nodesArr = [];

@@ -117,7 +117,8 @@ export default function getData(myData, nodes_array){
                                     "msReturn": methods[url]["returnType"],
                                 }
                                 ],
-                                "name": name
+                                "name": name,
+                                "type":"link",
                             },
                         )
     
