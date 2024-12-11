@@ -3,7 +3,6 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
-import myData from "./data/IR 1.json";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
@@ -16,14 +15,14 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 
-
+// To choose a file to import, change the import in getData.js and createConnections.js
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(myData);
+    const [graphData, setGraphData] = useState([]);
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -57,7 +56,7 @@ function App(data: any) {
         const getGraphLifespan = async () => {
             
            
-            setGraphTimeline([myData]);
+            setGraphTimeline([data]);
             setGraphData(data["data"]);
             setCurrentInstance(0);
         };
@@ -141,6 +140,7 @@ function App(data: any) {
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+                endpointCalls={[]}
             />
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 

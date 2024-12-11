@@ -2,6 +2,7 @@ import React from "react";
 import myData from "./data/IR323_3138.json";
 
 
+
 export default function getData(nodes_array){
     let microservices = myData["microservices"];
     let nodes = [];
@@ -35,18 +36,18 @@ export default function getData(nodes_array){
                 let url = method["url"];
                 let http = method["httpMethod"];
                 // Check if this method has a default annotation, then also add that url
-                if ("default" in method["annotations"][0]["attributes"]){
-                    let temp_url = method["annotations"][0]["attributes"]["default"];
-                    methods[temp_url] = {
-                        "microservice" : nodeName, 
-                        "parameters": parameters,
-                        "returnType": returnType,
-                        "methodName": methodName,
-                        "className": method["className"],
-                        "httpMethod": http,
-                    }
+                //if ("default" in method["annotations"][0]["attributes"]){
+                    //let temp_url = method["annotations"][0]["attributes"]["default"];
+                    //methods[temp_url] = {
+                        //"microservice" : nodeName, 
+                        //"parameters": parameters,
+                       //"returnType": returnType,
+                       // "methodName": methodName,
+                       // "className": method["className"],
+                       // "httpMethod": http,
+                    //}
 
-                }
+               // }
                 methods[url] = {
                     "microservice" : nodeName, 
                     "parameters": parameters,
@@ -105,6 +106,7 @@ let links = [];
                             {
                                 "source": source,
                                 "target": destination,
+                                "nodeType": "link",
                                 "requests": [
                                   {
                                     "destinationUrl": url,

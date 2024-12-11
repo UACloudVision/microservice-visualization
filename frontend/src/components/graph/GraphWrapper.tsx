@@ -22,6 +22,7 @@ type Props = {
     selectedAntiPattern: any;
     trackNodes: any;
     focusNode: any;
+    endpointCalls: any;
 };
 
 const VisualizationOptions: React.FC<Props> = ({
@@ -43,6 +44,7 @@ const VisualizationOptions: React.FC<Props> = ({
     selectedAntiPattern,
     trackNodes,
     focusNode,
+    endpointCalls
 }) => {
     const Shared2D3DProps: SharedProps = {
         linkDirectionalArrowRelPos: 1,
@@ -88,6 +90,8 @@ const VisualizationOptions: React.FC<Props> = ({
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+                endpointCalls={endpointCalls}
+
             />
         </div>
     );
