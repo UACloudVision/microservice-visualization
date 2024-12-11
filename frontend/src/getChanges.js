@@ -284,11 +284,24 @@ const findModifications = (linkA, linkB) => {
         let requestsB = linkB['links'][k]['requests']
         let requestDifferences = getRequestDifferences(requestsA, requestsB);
         // FIXME Needs some iterating though requestDifferences here to determine color and should set requests to requestsB
+        let requests = [];
+        for (let k of requestDifferences["linkAdditions"]) {
+            k["color"] = 'green'
+            requests.push(k);
+        }
+        for (let k of requestDifferences["linkSubtractions"]) {
+            k["color"] = 'red'
+            requests.push(k);
+        }
+        for (let k of requestDifferences["unmodifiedRequest"]) {
+            k["color"] = 'grey'
+            requests.push(k);
+        }
         if (requestDifferences["linkAdditions"].length == 0 && requestDifferences["linkSubtractions"] == 0) {
-            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB, "type":"link"});
+            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requests, "type":"link"});
         }
         else {
-            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requestsB, "color": "yellow", "type":"link"});
+            links.push({'name': k, 'source': linkB['links'][k]['source'], 'target': linkB['links'][k]['target'], 'requests': requests, "color": "yellow", "type":"link"});
         }
     }
 

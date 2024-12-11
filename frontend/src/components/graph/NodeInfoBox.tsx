@@ -12,6 +12,19 @@ type Props = {
 export const InfoBox = (props: Props) => {
     const { anchorPoint, show, name, type, depends, setShow, dependencies, patterns, methods, source, destination} =
         useInfoBox(props.graphData, props.setFocusNode);
+
+    const getColorClass = (color: string) => {
+        switch (color) {
+            case 'red':
+            return 'bg-red-500';
+            case 'green':
+            return 'bg-green-500';
+            case 'grey':
+            return 'bg-gray-500';
+            default:
+            return 'bg-white'; // default background color
+        }
+    };
     
     // Popup for a link
     if (type == "link"){
@@ -36,7 +49,7 @@ export const InfoBox = (props: Props) => {
                                     link.requests &&
                                     link.requests.length > 0 ? (
                                         link.requests.map((func: any) => (
-                                            <ul style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }} className="">
+                                            <ul style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }} className={getColorClass(func.color)}>
                                                 <li className="font-medium">
                                                     Source method: {func.sourceMethod}
                                                 </li>
