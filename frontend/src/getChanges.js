@@ -1,5 +1,162 @@
-import getData from "./getData";
-//Sandeep created the getData.js functions. We then parse the return of that function to get the differences
+//import getData from "./getData";
+//This function is very simliar to the getData function imported above and written by Sandeep, but has a key distinction that our change parser uses.
+function getData(myData, nodes_array) {
+    let microservices = myData["microservices"];
+    let nodes = [];
+    let methods = {};
+    
+    for (let i=0; i<microservices.length;i++){
+        let microservice = microservices[i];
+        let nodeName = microservice["name"];
+        let nodePath = microservice["path"];
+        // This if statement is used to filter nodes if a nodes_array 
+        // has been inputted, and only uses nodes that are in the nodes_array
+        if (nodes_array == undefined || nodes_array.includes(nodeName)){
+            nodes.push({
+                "nodeName": nodeName,
+                "nodeType": "microservice",
+                "nodePath": nodePath
+            });
+
+        } else {
+            continue;
+        }
+        
+        let controllers = microservice["controllers"];
+        for (let i=0; i<controllers.length; i++){
+            let controller = controllers[i];
+            let functions = controller["methods"];
+            for (let i=0; i<functions.length; i++){
+                let method = functions[i];
+                let methodName = method["name"];
+                let parameters = method["parameters"];
+                let returnType = method["returnType"];
+                let url = method["url"];
+                let http = method["httpMethod"];
+                // Check if this method has a default annotation, then also add that url
+                if ((method["annotations"]?.[0]) && ("default" in method["annotations"][0]["attributes"])) {
+                    let temp_url = method["annotations"][0]["attributes"]["default"];
+                    methods[temp_url] = {
+                        "microservice" : nodeName, 
+                        "parameters": parameters,
+                        "returnType": returnType,
+                        "methodName": methodName,
+                        "className": method["className"],
+                        "httpMethod": http,
+                    }
+                } else {
+                    methods[url] = {
+                        "microservice" : nodeName, 
+                        "parameters": parameters,
+                        "returnType": returnType,
+                        "className": method["className"],
+                        "methodName": methodName,
+                        "httpMethod": http,
+                    }
+                }
+            }
+        }
+    }
+
+    let connections = [];
+    let links = {};
+    // array can be controller or service
+    function iterateThrough(array){
+        for (let i=0; i<array.length; i++){
+            let arr = array[i];
+            let methodCalls = arr["methodCalls"];
+            for (let i=0; i<methodCalls.length; i++){
+                let methodCall = methodCalls[i];
+                // This is calling another microservice if the methodCall 
+                // has a url parameter defined
+                if (!("url" in methodCall)){
+                    continue;
+                }
+                
+                let url = methodCall["url"];
+                if (!(url in methods)){
+                    continue;
+                }
+                
+                let http = methodCall["httpMethod"];
+                let className;
+                if (arr["implementedTypes"].length == 1){ 
+                    className = arr["implementedTypes"][0];
+                } else {
+                    className = arr["name"];
+                }
+                let calledFrom = methodCall["calledFrom"];
+                let destination = methods[url]["microservice"];
+                let source = methodCall["microserviceName"];
+                let parameters = methodCall["parameterContents"];
+                let name = source.concat(" --> ", destination);
+                if (source != destination){
+                    // Check if this connection is already in 
+                    // connections array
+                    if (!(connections.includes(name))){
+                        connections.push(name);
+                        links[name] =
+                            {
+                                "source": source,
+                                "target": destination,
+                                "requests": [
+                                    {
+                                    "destinationUrl": url,
+                                    "sourceMethod": calledFrom,
+                                    "endpointFunction": methodCall["name"],
+                                    "className": className,
+                                    "destinationclassName": methods[url]["className"],
+                                    "type": http,
+                                    "argument": parameters,
+                                    "msReturn": methods[url]["returnType"],
+                                    }
+                                ]
+                            };
+                    } else {
+                        // The index of this connection in the connections array
+                        // is the same index in the links array. Find 
+                        // the link based on the index of the name in 
+                        // connections array and push a new object into 
+                        // the "requests" parameter
+                        links[name]["requests"].push(
+                            {
+                                "destinationUrl": url,
+                                "sourceMethod": calledFrom,
+                                "endpointFunction": methodCall["name"],
+                                "className": className,
+                                "destinationclassName": methods[url]["className"],
+                                "type": http,
+                                "argument": parameters,
+                                "msReturn": methods[url]["returnType"],
+                            }
+                        );
+                    }
+                } 
+            }
+        }
+    }
+
+    for (let i=0; i<microservices.length;i++){
+        let microservice = microservices[i];
+        let nodeName = microservice["name"];
+
+        if (!(nodes_array == undefined) && !(nodes_array.includes(nodeName))){
+            continue;
+        }
+
+        let controllers = microservice["controllers"];
+        let services = microservice["services"];
+        iterateThrough(services);
+        iterateThrough(controllers);
+    }
+
+    return {
+        "graphName": "msgraph",
+        "nodes": nodes, 
+        "links": links, 
+        "gitCommitId": myData["commitID"]
+    };
+}
 
 function getLinkDifferences(link1, link2) {
     //Uses sets to find the additions subtractions and unchanges links between microservices
