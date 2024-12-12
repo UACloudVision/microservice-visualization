@@ -6,12 +6,12 @@ import reportWebVitals from './reportWebVitals';
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import getData from "./getData.js";
 import axios from "axios";
-import commit1 from './data/IR2_57b3.json';
 
 
 setupLogger();
 setupAxios();
-//Unsure what this is used for, possibly backend integration but it shouldnt be using the commit1 import
+
+//Not used - possible initial state but it shouldn't be hardcoded using the commit1 import (possible backend integration)
 //let graphData = getData(commit1, undefined);
 //const graphLifespan = axios.post(`/graph/create`, graphData);
 
