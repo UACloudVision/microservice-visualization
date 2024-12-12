@@ -94,16 +94,13 @@ const GraphMenu: React.FC<Props> = ({
                     defaultChecked={trackChanges}
                     className="sr-only peer"
                     onClick={() => {
+                        // The setTrackChanges doesnt update fast enough for us to use it so we need to assign it to another variable in order to get the right boolean value
                         let newTrackChanges = !trackChanges;
                         setTrackChanges(newTrackChanges);
-                        console.log(trackChanges)
-                        if (newTrackChanges && (currentInstance != 0)) { //Thuis should be checking when trackChanges is true but the setTrackChanges takes too long to update the variable
-                            console.log("SHOW CHANGE DATA")
-                            console.log(graphTimeline[currentInstance - 1])
-                            console.log(graphTimeline[currentInstance])
+                        // When show track changes is toggled, change the data that is shown to be either the difference between two commits or just one commit
+                        if (newTrackChanges && (currentInstance != 0)) {
                             setGraphData(compareChanges(graphTimeline[currentInstance - 1], graphTimeline[currentInstance]))
                         } else {
-                            console.log("SHOW SINGLE DATA")
                             setGraphData(getData(graphTimeline[currentInstance]));
                         }
                     }}

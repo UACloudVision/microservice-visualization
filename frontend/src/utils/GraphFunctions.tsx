@@ -457,7 +457,6 @@ function getLinkColor(
     focusNode: any,
     showChanges: any)
 {  
-//If the changes are shown then color each link depending on if it was added subtracted or deleted 
     if (
         link.source.nodeName === hoverNode ||
         (focusNode && link.source.nodeName === focusNode.node)
@@ -489,7 +488,7 @@ function getLinkColor(
             }
         }
     }
-
+    //If the changes are shown then color each link depending on if it was added subtracted or deleted 
     if (showChanges) {
         if (link.color == 'green') {
             return `rgba(0, 255, 0,1)`;

@@ -10,10 +10,10 @@ import axios from "axios";
 
 setupLogger();
 setupAxios();
-// let graphData = getData(commit1, undefined);
-// console.log(graphData);
+
+//Not used - possible initial state but it shouldn't be hardcoded using the commit1 import (possible backend integration)
+//let graphData = getData(commit1, undefined);
 //const graphLifespan = axios.post(`/graph/create`, graphData);
-//console.log(graphLifespan);
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

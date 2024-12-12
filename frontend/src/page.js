@@ -24,6 +24,7 @@ function getData(data){
 
 }
 
+//The filter box that appears on the left side of the website, listing all of the microservices currently displayed. When you click filter it will then show the component view of those microservices
 export default function FilterBox(values){
     console.log(values);
     const graphData = values["graphData"];
@@ -78,15 +79,10 @@ export default function FilterBox(values){
             }
             
         }
-        // Change this later
         let data = getGraphData(values["graphTimeline"][values["currentInstance"]], nodes);
 
         
       let connections = getConnections(values["graphTimeline"][values["currentInstance"]], nodes, data["links"], );
-      console.log("Connection:");
-      console.log(connections);
-      console.log("Data:");
-      console.log(data);
       navigate('/node', {state: JSON.stringify(connections)});
 
     }

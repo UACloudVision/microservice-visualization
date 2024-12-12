@@ -22,6 +22,7 @@ type Props = {
     selectedAntiPattern: any;
     trackNodes: any;
     focusNode: any;
+    endpointCalls: any;
     trackChanges: any;
 };
 
@@ -44,6 +45,7 @@ const VisualizationOptions: React.FC<Props> = ({
     selectedAntiPattern,
     trackNodes,
     focusNode,
+    endpointCalls,
     trackChanges,
 }) => {
     const Shared2D3DProps: SharedProps = {
@@ -90,6 +92,7 @@ const VisualizationOptions: React.FC<Props> = ({
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+                endpointCalls={endpointCalls}
                 trackChanges={trackChanges}
             />
         </div>

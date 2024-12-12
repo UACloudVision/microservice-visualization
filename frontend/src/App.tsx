@@ -3,7 +3,6 @@ import GraphWrapper from "./components/graph/GraphWrapper";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
-// import myData from "./data/IR 1.json";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
@@ -57,30 +56,30 @@ function App(data: any) {
     //}, [graphName]);
 
     useEffect(() => {
+        // This function allows the user to input a file, which we call input.json (imported as the term files), containing a list of IR file names for the timeline to contain
+        // The function will then grab the contents of each of those files and push them to a temp array before adding them to the graphtimeline. It must be done this way
+        // The files called in input.json must be in frontend/public/data 
         const fetchData = async () => {
             try {
                 let temp: any = [];
                 for (const filePath of files["files"]) {
                     const fileResponse = await fetch(filePath);
                     const fileData = await fileResponse.json();
-                    console.log(fileData);
                     // Call getData with the JSON content
-                    // check if a commit with that id already in it? Runs twice for some reason
+                    // check if a commit with that id already in it? Runs twice due to react strict mode
                     if (!temp.some((commit: any) => commit.commitID === fileData.commitID)) {
                         temp.push(fileData);
                     }
                 }
-                console.log(temp);
                 return temp;
-                // setCommits(temp);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
         const getGraphLifespan = async () => {
+            //Fethcing the contents of the IR files from the input.json file. In the future could be made more dynamic by having the user input a file. 
             let commits = await fetchData();
-            console.log(commits);
             setGraphTimeline(commits);     //HERE is how to manage the timeline
             setGraphData(getData(commits[0], undefined));
             setCurrentInstance(0);
@@ -88,18 +87,6 @@ function App(data: any) {
 
         getGraphLifespan();
     }, [graphName]);
-
-    // For without the file as inputs of which commit to use
-    // useEffect(() => {
-    //     const getGraphLifespan = async () => {
-    //         setGraphTimeline([commit1, commit2, commit3]);     //HERE is how to manage the timeline
-    //         setGraphData(getData(commit1, undefined));
-    //         setCurrentInstance(0);
-    //     };
-
-    //     getGraphLifespan();
-    // }, [graphName]);
-
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         //Ideally just return a prompt to upload a file or use some default file
@@ -109,16 +96,8 @@ function App(data: any) {
        <BrowserRouter >
         <Routes>
           <Route path="/" element=  
-          
         
-        
-        {<div
-           
-            className={`max-w-full min-h-screen max-h-screen overflow-clip ${
-                isDark ? `bg-gray-900` : `bg-gray-100`
-            }`}
-            ref={ref}
-        >
+        {<div className={`max-w-full min-h-screen max-h-screen overflow-clip ${isDark ? `bg-gray-900` : `bg-gray-100`}`} ref={ref}>
             {/* Upper left mode toggle */}
             <GraphMode
                 value={value}
@@ -132,6 +111,7 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
             />
             
+            {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
             <FilterBox
                 key={`${currentInstance}-${trackChanges}`}
                 graphData={graphData} 
@@ -182,6 +162,7 @@ function App(data: any) {
                 selectedAntiPattern={selectedAntiPattern}
                 trackNodes={trackNodes}
                 focusNode={focusNode}
+                endpointCalls={[]}
                 trackChanges={trackChanges}
             />
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
