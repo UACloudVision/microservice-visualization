@@ -6,21 +6,21 @@ import reportWebVitals from './reportWebVitals';
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import getData from "./getData.js";
 import axios from "axios";
+import commit1 from './data/IR2_57b3.json';
 
 
 setupLogger();
 setupAxios();
-let graphData = getData(undefined);
-console.log(graphData);
+//Unsure what this is used for, possibly backend integration but it shouldnt be using the commit1 import
+//let graphData = getData(commit1, undefined);
 //const graphLifespan = axios.post(`/graph/create`, graphData);
-//console.log(graphLifespan);
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <React.StrictMode>
-        <App data={graphData}/>
+        <App data={null}/>
     </React.StrictMode>
 );
 

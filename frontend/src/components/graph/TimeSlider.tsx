@@ -1,5 +1,17 @@
 import React, { useState } from "react";
+import compareChanges from "../../getChanges";
+import getData from "../../getData";
 
+//*
+// The time slide is what controller which commit is shown on the visualization
+// It contains a few key parameters, setGraphTimeline, which can be used to update the commits available to the user
+// setGraphData which is used to update the actual data being shown on the graph,
+// graphTimeline which is an array of everyting on the timeline. Currently each array element contains the entire dictionary of an IR file
+// currentInstance which is the index of the currently selected item on the timeline
+// setCurrentInstance is called whenever the timeline is moved
+// trackChanges is a toggle in the top right corner of the website which allows you to see the difference between the selected commit and the previous commit. This determines if getChanges() or getData() are called
+// 
+// */
 type Props = {
     max: number;
     setGraphData: any;
@@ -7,6 +19,7 @@ type Props = {
     currentInstance: any;
     setCurrentInstance: any;
     setDefNodeColor: any;
+    trackChanges: any;
 };
 const TimeSlider: React.FC<Props> = ({
     max,
@@ -15,13 +28,20 @@ const TimeSlider: React.FC<Props> = ({
     currentInstance,
     setCurrentInstance,
     setDefNodeColor,
+    trackChanges,
 }) => {
     const [value, setValue] = useState(0);
 
     const handleChange = (e: any) => {
+        //Everytime the slide is changed, set the currentInstance and then call either getChanges or getData depending on if the showChanges toggle is true or false
         setValue(e.target.value);
         setCurrentInstance(parseInt(e.target.value));
-        setGraphData(graphTimeline[e.target.value]);
+        if (trackChanges && (e.target.value != 0)) {
+            setGraphData(compareChanges(graphTimeline[e.target.value - 1], graphTimeline[e.target.value]))
+        } else {
+            setGraphData(getData(graphTimeline[e.target.value]));
+        }
+        
         setDefNodeColor(false);
     };
     return (
@@ -48,7 +68,7 @@ const TimeSlider: React.FC<Props> = ({
                         Iteration {value}
                     </div>
                     <div>
-                        Commit #{graphTimeline[currentInstance].gitCommitId}
+                        Commit #{graphTimeline[currentInstance].commitID}
                     </div>
                     <div>
                         Created {graphTimeline[currentInstance].createDate}

@@ -11,40 +11,29 @@ import getConnections from "./createConnections.js"
 
 function getData(data){
     
-  let microservices = data["microservices"];
+  let microservices = data["nodes"];
   let names = [];
   let indices = [];
   for (let i=0; i<microservices.length; i++ ){
       let microservice = microservices[i];
-      names.push(microservice["name"]);
+      names.push(microservice["nodeName"]);
       indices.push(i);
   }
 
   return [names, indices];
-    
-    //let microservices = graphData["nodes"];
-    //let names = [];
-    //let indices = [];
-   // for (let i=0; i<microservices.length; i++ ){
-       //let microservice = microservices[i];
-        //names.push(microservice["nodeName"]);
-        //indices.push(i);
-    //}
-    
-    
-
 
 }
 
+//The filter box that appears on the left side of the website, listing all of the microservices currently displayed. When you click filter it will then show the component view of those microservices
 export default function FilterBox(values){
-    
+    console.log(values);
     const graphData = values["graphData"];
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const arr = getData(myData);
+    const arr = getData(graphData);
     const [nodes, setNodes] = useState(arr[0])
-    const [indices, setIndices] = useState(arr[1])
+    //const [indices, setIndices] = useState(arr[1])
     const [selectedIds, setSelectedIds] = useState(arr[0]);
   
 
@@ -90,13 +79,10 @@ export default function FilterBox(values){
             }
             
         }
-        // Change this later
-        let data = getGraphData(nodes);
+        let data = getGraphData(values["graphTimeline"][values["currentInstance"]], nodes);
 
         
-      let connections = getConnections(nodes, data["links"]);
-      console.log(connections);
-  
+      let connections = getConnections(values["graphTimeline"][values["currentInstance"]], nodes, data["links"], );
       navigate('/node', {state: JSON.stringify(connections)});
 
     }

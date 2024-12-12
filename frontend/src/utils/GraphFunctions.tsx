@@ -11,7 +11,7 @@ const DARK_GRAY = "rgb(50,50,50)";
 
 const IN_PATTERN = "rgb(235,52,192)";
 
-const LINK_FROM_HOVER = "rgba(232, 190, 39,1)";
+const LINK_FROM_HOVER = "rgba(52, 143, 235,1)";
 const LINK_TO_HOVER = "rgba(179, 66, 245,1)";
 
 function getShape(type: String): number {
@@ -67,7 +67,8 @@ function getColor(
     colorMode: any,
     selectedAntiPattern: any,
     trackNodes: any,
-    focusNode: any
+    focusNode: any,
+    trackChanges: any,
 ): any {
     if (highlightNodes && highlightNodes.has(node.nodeName)) {
         if (node.nodeName === hoverNode) {
@@ -117,6 +118,16 @@ function getColor(
             case "High Coupling":
                 return getColorCoupling(node, graphData, threshold);
             // default just continue into visual color scheme (based on theme)
+        }
+    }
+
+    if (trackChanges) {
+        if (node.color == 'green') {
+            return "rgb(0, 255, 0)";
+        } else if (node.color == 'red') {
+            return "rgb(255, 0, 0)";
+        } else if (node.color == 'yellow'){
+            return "rgb(255, 115, 0)";
         }
     }
 
@@ -377,7 +388,8 @@ function getSpriteColor(
     colorMode: any,
     selectedAntiPattern: any,
     trackNodes: any,
-    focusNode: any
+    focusNode: any,
+    trackChanges: any,
 ) {
     return getColor(
         node,
@@ -391,7 +403,8 @@ function getSpriteColor(
         colorMode,
         selectedAntiPattern,
         trackNodes,
-        focusNode
+        focusNode,
+        trackChanges
     );
 }
 
@@ -441,8 +454,9 @@ function getLinkColor(
     antiPattern: any,
     threed: any,
     selectedAntiPattern: any,
-    focusNode: any
-) {
+    focusNode: any,
+    showChanges: any)
+{  
     if (
         link.source.nodeName === hoverNode ||
         (focusNode && link.source.nodeName === focusNode.node)
@@ -472,6 +486,16 @@ function getLinkColor(
 
                 return color;
             }
+        }
+    }
+    //If the changes are shown then color each link depending on if it was added subtracted or deleted 
+    if (showChanges) {
+        if (link.color == 'green') {
+            return `rgba(0, 255, 0,1)`;
+        } else if (link.color == 'red') {
+            return `rgba(255, 0, 0,1)`;
+        } else if (link.color == 'yellow'){
+            return `rgba(255, 115, 0,1)`;
         }
     }
 

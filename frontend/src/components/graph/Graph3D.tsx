@@ -31,6 +31,7 @@ type Props = {
     trackNodes: any;
     focusNode: any;
     endpointCalls: any;
+    trackChanges: any;
 };
 
 const Graph: React.FC<Props> = ({
@@ -50,7 +51,8 @@ const Graph: React.FC<Props> = ({
     selectedAntiPattern,
     trackNodes,
     focusNode,
-    endpointCalls
+    endpointCalls,
+    trackChanges,
 }) => {
     const [highlightNodes, setHighlightNodes] = useState<Set<string>>(
         new Set()
@@ -182,7 +184,8 @@ const Graph: React.FC<Props> = ({
                     colorMode,
                     selectedAntiPattern,
                     trackNodes,
-                    focusNode
+                    focusNode,
+                    trackChanges
                 );
                 
                 let func;
@@ -278,7 +281,8 @@ const Graph: React.FC<Props> = ({
                     antiPattern,
                     true,
                     selectedAntiPattern,
-                    focusNode
+                    focusNode,
+                    trackChanges
                 )
             }
             linkDirectionalParticles={(link: any) => {
@@ -301,7 +305,8 @@ const Graph: React.FC<Props> = ({
                     antiPattern,
                     true,
                     selectedAntiPattern,
-                    focusNode
+                    focusNode,
+                    trackChanges
                 )
             }
             linkOpacity={undefined}

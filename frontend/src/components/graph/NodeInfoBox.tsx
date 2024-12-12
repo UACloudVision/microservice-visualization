@@ -9,9 +9,23 @@ type Props = {
     
 };
 
+//Info box shown when you click on a link or a node
 export const InfoBox = (props: Props) => {
     const { anchorPoint, show, name, type, depends, setShow, dependencies, patterns, methods, source, destination} =
         useInfoBox(props.graphData, props.setFocusNode);
+
+    const getColorClass = (color: string) => {
+        switch (color) {
+            case 'red':
+            return 'bg-red-500';
+            case 'green':
+            return 'bg-green-500';
+            case 'grey':
+            return 'bg-gray-500';
+            default:
+            return 'bg-white'; // default background color
+        }
+    };
     
     // Popup for a link
     if (type == "link"){
@@ -36,7 +50,9 @@ export const InfoBox = (props: Props) => {
                                     link.requests &&
                                     link.requests.length > 0 ? (
                                         link.requests.map((func: any) => (
-                                            <ul style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }} className="">
+                                            //Set the background color in the classname based on the color attribute of the request.
+                                            //Could be reimplemented for individual properties of a request
+                                            <ul style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }} className={getColorClass(func.color)}>
                                                 <li className="font-medium">
                                                     Source method: {func.sourceMethod}
                                                 </li>
@@ -163,7 +179,7 @@ export const InfoBox = (props: Props) => {
         );
 
     }
-
+    //Return popup link for a node
     return (
         <ul
             className={`absolute flex-col top-[10%] left-[60%] bg-slate-200 bg-opacity-90 gap-2 rounded-lg p-4 max-h-96

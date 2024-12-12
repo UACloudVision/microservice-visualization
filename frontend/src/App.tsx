@@ -15,14 +15,18 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 
-// To choose a file to import, change the import in getData.js and createConnections.js
+import getData from "./getData";
+import compareChanges from "./getChanges.js";
+
+import files from './data/input.json';
+
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
     const [value, setValue] = useState(8);
     const [initCoords, setInitCoords] = useState(null);
     const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState([]);
+    const [graphData, setGraphData] = useState<{ graphName: string; nodes: { nodeName: any; nodeType: string; }[]; links: any[]; gitCommitId: any; } | null>(null);
     const [is3d, setIs3d] = useState(true);
     const [antiPattern, setAntiPattern] = useState(false);
     const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
@@ -30,6 +34,7 @@ function App(data: any) {
     const [color, setColor] = useState("dark-default");
     const ref = useRef<HTMLDivElement>(null);
     const [isDark, setIsDark] = useState(true);
+    const [trackChanges, setTrackChanges] = useState(true);
     const [graphName, setGraphName] = useState("test");
     const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
     const [currentInstance, setCurrentInstance] = useState<number>();
@@ -37,9 +42,7 @@ function App(data: any) {
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
 
-   
-    
-
+    // For using backend
     //useEffect(() => {
         //const getGraphLifespan = async () => {
             //const graphLifespan = await axios.get(`/graph/${graphName}`);
@@ -51,38 +54,50 @@ function App(data: any) {
 
         //getGraphLifespan();
     //}, [graphName]);
-    console.log(data["data"]);
+
     useEffect(() => {
+        // This function allows the user to input a file, which we call input.json (imported as the term files), containing a list of IR file names for the timeline to contain
+        // The function will then grab the contents of each of those files and push them to a temp array before adding them to the graphtimeline. It must be done this way
+        // The files called in input.json must be in frontend/public/data 
+        const fetchData = async () => {
+            try {
+                let temp: any = [];
+                for (const filePath of files["files"]) {
+                    const fileResponse = await fetch(filePath);
+                    const fileData = await fileResponse.json();
+                    // Call getData with the JSON content
+                    // check if a commit with that id already in it? Runs twice due to react strict mode
+                    if (!temp.some((commit: any) => commit.commitID === fileData.commitID)) {
+                        temp.push(fileData);
+                    }
+                }
+                return temp;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
         const getGraphLifespan = async () => {
-            
-           
-            setGraphTimeline([data]);
-            setGraphData(data["data"]);
+            //Fethcing the contents of the IR files from the input.json file. In the future could be made more dynamic by having the user input a file. 
+            let commits = await fetchData();
+            setGraphTimeline(commits);     //HERE is how to manage the timeline
+            setGraphData(getData(commits[0], undefined));
             setCurrentInstance(0);
         };
 
         getGraphLifespan();
     }, [graphName]);
-   
+
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         //Ideally just return a prompt to upload a file or use some default file
         return null;
     }
-    console.log(graphRef);
     return (
        <BrowserRouter >
         <Routes>
           <Route path="/" element=  
-          
         
-        
-        {<div
-           
-            className={`max-w-full min-h-screen max-h-screen overflow-clip ${
-                isDark ? `bg-gray-900` : `bg-gray-100`
-            }`}
-            ref={ref}
-        >
+        {<div className={`max-w-full min-h-screen max-h-screen overflow-clip ${isDark ? `bg-gray-900` : `bg-gray-100`}`} ref={ref}>
             {/* Upper left mode toggle */}
             <GraphMode
                 value={value}
@@ -96,11 +111,14 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
             />
             
+            {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
             <FilterBox
-                graphData={graphData}
-                
-            >
-            </FilterBox>
+                key={`${currentInstance}-${trackChanges}`}
+                graphData={graphData} 
+                currentInstance={currentInstance}
+                graphTimeline={graphTimeline}
+                trackChanges={trackChanges}
+            ></FilterBox>
             
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
@@ -117,8 +135,12 @@ function App(data: any) {
                 setIs3d={setIs3d}
                 isDark={isDark}
                 setIsDark={setIsDark}
+                trackChanges={trackChanges}
+                setTrackChanges={setTrackChanges}
                 antiPattern={antiPattern}
                 selectedAntiPattern={selectedAntiPattern}
+                currentInstance={currentInstance}
+                graphTimeline={graphTimeline}
             />
             {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
             <GraphWrapper
@@ -141,6 +163,7 @@ function App(data: any) {
                 trackNodes={trackNodes}
                 focusNode={focusNode}
                 endpointCalls={[]}
+                trackChanges={trackChanges}
             />
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 
@@ -172,6 +195,7 @@ function App(data: any) {
                     currentInstance={currentInstance}
                     setCurrentInstance={setCurrentInstance}
                     setDefNodeColor={setDefNodeColor}
+                    trackChanges={trackChanges}
                 />
             </div>
             <TrackNodeMenu
