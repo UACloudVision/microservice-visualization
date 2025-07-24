@@ -109,7 +109,7 @@ function App(data: any) {
                 graphData={graphData}
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
-            />
+            />*
             
             {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
             <FilterBox

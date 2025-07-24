@@ -38,7 +38,7 @@ export default function getData(myData, nodes_array){
                 let url = method["url"];
                 let http = method["httpMethod"];
                 //Check if this method has a default annotation, then also add that url
-                if (method["annotations"].length > 0 && "default" in method["annotations"][0]["attributes"]){
+                if (method["annotations"].length > 0 && method["annotations"][0]["attributes"] && "default" in method["annotations"][0]["attributes"]){
                     let temp_url = method["annotations"][0]["attributes"]["default"];
                     methods[temp_url] = {
                         "microservice" : nodeName, 
