@@ -136,11 +136,11 @@ export default function FilterBox(values){
   const styles = {
     Bar:{
       display:'flex',
-      top: "48%",
+      top: "59%",
       width: "25%",
       fontSize:"20px",
       overflow: "auto",
-      height:"50%",
+      height:"39%",
       bottom: "1px",
     },
     searchBar: {
