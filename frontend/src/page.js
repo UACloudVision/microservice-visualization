@@ -19,14 +19,11 @@ function getData(data){
       names.push(microservice["nodeName"]);
       indices.push(i);
   }
-
   return [names, indices];
-
 }
 
 //The filter box that appears on the left side of the website, listing all of the microservices currently displayed. When you click filter it will then show the component view of those microservices
 export default function FilterBox(values){
-    console.log(values);
     const graphData = values["graphData"];
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);

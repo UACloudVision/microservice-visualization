@@ -14,6 +14,7 @@ import { BrowserRouter, Router } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
+import IRFileUpload from "./components/IRFileUpload";
 
 import getData from "./getData";
 import compareChanges from "./getChanges.js";
@@ -41,6 +42,23 @@ function App(data: any) {
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
+    const [irs, setIRs] = useState([]);
+
+    const onFileUpload = (file: File) => {
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+            resolve(reader.result as string);
+            };
+
+            reader.onerror = () => {
+            reject(reader.error);
+            };
+
+            reader.readAsText(file);
+        }).then((data) => console.log(data));
+    }
 
     // For using backend
     //useEffect(() => {
@@ -119,6 +137,8 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
                 trackChanges={trackChanges}
             ></FilterBox>
+
+            <IRFileUpload onFileSelect={onFileUpload} />
             
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
