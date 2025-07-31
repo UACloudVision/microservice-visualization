@@ -37,12 +37,11 @@ function App(data: any) {
     const [isDark, setIsDark] = useState(true);
     const [trackChanges, setTrackChanges] = useState(true);
     const [graphName, setGraphName] = useState("test");
-    const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
+    const [graphTimeline, setGraphTimeline] = useState<any[]>([]);
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
-    const [irs, setIRs] = useState([]);
 
     const onFileUpload = (file: File) => {
         new Promise((resolve, reject) => {
@@ -57,7 +56,10 @@ function App(data: any) {
             };
 
             reader.readAsText(file);
-        }).then((data) => console.log(data));
+        }).then((data: any) => {
+            const ir = JSON.parse(data);
+            setGraphTimeline(prev => [...prev, ir]);
+        });
     }
 
     // For using backend

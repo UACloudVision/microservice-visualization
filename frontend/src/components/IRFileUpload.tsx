@@ -7,7 +7,6 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log('Files dropped:', acceptedFiles);
     onFileSelect(acceptedFiles[0])
   }, [onFileSelect]);
 
@@ -48,7 +47,7 @@ return (
 
     {selectedFile && (
       <div>
-        <strong>Selected:</strong> {selectedFile.name}
+        <strong>Upload successful! Check the timeline for new entries.</strong>
       </div>
     )}
   </div>
