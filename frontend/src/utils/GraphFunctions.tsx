@@ -149,7 +149,8 @@ function getColorVisual(
     setDefNodeColor: any,
     colorMode: string
 ): ColorRepresentation {
-    if ("color" in node){
+    if ("color" in node && !(node["color"].includes("rgb")) && node["color"] !== "-1"){
+        console.log(node["color"])
         return "rgb".concat(node["color"]);
     }
     switch (colorMode) {

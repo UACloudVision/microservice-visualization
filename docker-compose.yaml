@@ -28,6 +28,7 @@ services:
       - mariadb
     networks:
       - app_network
+    restart: always
 
   frontend:
     build:

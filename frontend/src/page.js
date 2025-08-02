@@ -19,14 +19,11 @@ function getData(data){
       names.push(microservice["nodeName"]);
       indices.push(i);
   }
-
   return [names, indices];
-
 }
 
 //The filter box that appears on the left side of the website, listing all of the microservices currently displayed. When you click filter it will then show the component view of those microservices
 export default function FilterBox(values){
-    console.log(values);
     const graphData = values["graphData"];
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -86,11 +83,12 @@ export default function FilterBox(values){
       navigate('/node', {state: JSON.stringify(connections)});
 
     }
+    
+    return null;
       
+    /*return (
       
-    return (
-      
-        <div className="absolute top-2 left-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-52 max-h-full"
+        <div className="absolute top-2 right-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-52 max-h-full"
         style={styles.Bar}>
             
         <input
@@ -128,7 +126,7 @@ export default function FilterBox(values){
           
       </div>
       
-    );
+    );*/
   };
 
   
@@ -136,15 +134,12 @@ export default function FilterBox(values){
   const styles = {
     Bar:{
       display:'flex',
-      top: "250px",
-      width: "500px",
-      fontSize:"30px",
-      backgroundColor: 'rgb(133, 168, 237)',
+      top: "59%",
+      width: "25%",
+      fontSize:"20px",
       overflow: "auto",
-      height:"500px",
+      height:"39%",
       bottom: "1px",
-      
-    
     },
     searchBar: {
       display:'flex',
@@ -182,13 +177,11 @@ export default function FilterBox(values){
       marginTop: 'auto',
       justifyContent: 'space-between',
       alignItems: 'center',
-      
-
     },
     button: {
       overflow: 'auto',
       padding: '10px 20px',
-      fontSize: '25px',
+      fontSize: '20px',
       borderRadius: '20px',
       backgroundColor: 'white',
       color: 'black',

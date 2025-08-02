@@ -48,7 +48,7 @@ const ColorSelector: React.FC<Props> = ({
     };
 
     return (
-        <div className="absolute bottom-16 left-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-44">
+        <div className="absolute top-2 right-48 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-44">
             <div>
                 <button
                     type="button"
@@ -95,7 +95,7 @@ const ColorSelector: React.FC<Props> = ({
                                 </div>
                             </button>
                         </li>
-                        <li>
+                        {/*<li>
                             <button
                                 type="button"
                                 onClick={handleSelectMode}
@@ -142,7 +142,7 @@ const ColorSelector: React.FC<Props> = ({
                                     Disk Usage
                                 </div>
                             </button>
-                        </li>
+                        </li>*/}
                         <li>
                             <button
                                 type="button"
@@ -164,7 +164,7 @@ const ColorSelector: React.FC<Props> = ({
             ) : (
                 <></>
             )}
-            {showSlider ? (
+            {/*showSlider ? (
                 <Slider
                     max={max}
                     setMax={setMax}
@@ -175,7 +175,7 @@ const ColorSelector: React.FC<Props> = ({
                 />
             ) : (
                 <></>
-            )}
+            )*/}
         </div>
     );
 };

@@ -38,7 +38,7 @@ export default function getData(myData, nodes_array){
                 let url = method["url"];
                 let http = method["httpMethod"];
                 //Check if this method has a default annotation, then also add that url
-                if (method["annotations"].length > 0 && "default" in method["annotations"][0]["attributes"]){
+                if (method["annotations"].length > 0 && method["annotations"][0]["attributes"] && "default" in method["annotations"][0]["attributes"]){
                     let temp_url = method["annotations"][0]["attributes"]["default"];
                     methods[temp_url] = {
                         "microservice" : nodeName, 
@@ -65,48 +65,74 @@ export default function getData(myData, nodes_array){
     let connections = [];
     let links = [];
     // array can be controller or service
-    function iterateThrough(array){
+    function iterateThrough(array, microserviceName){
         for (let i=0; i<array.length; i++){
             let arr = array[i];
-            let methodCalls = arr["methodCalls"];
-            for (let i=0; i<methodCalls.length; i++){
-                let methodCall = methodCalls[i];
-                // This is calling another microservice if the methodCall 
-                // has a url parameter defined
-                if (!("url" in methodCall)){
-                    continue;
-                }
-                
-                let url = methodCall["url"];
-                if (!(url in methods)){
-                    continue;
-                }
-                
-                let http = methodCall["httpMethod"];
-                let className;
-                if (arr["implementedTypes"].length == 1){ 
-                    className = arr["implementedTypes"][0];
+            let funcs = arr["methods"];
+            for (let i = 0; i < funcs.length; i++) {
+                let methodCalls = funcs[i]["methodCalls"];
+                for (let i=0; i<methodCalls.length; i++){
+                    let methodCall = methodCalls[i];
+                    // This is calling another microservice if the methodCall 
+                    // has a url parameter defined
+                    if (!("url" in methodCall)){
+                        continue;
+                    }
+                    
+                    let url = methodCall["url"];
+                    if (!(url in methods)){
+                        continue;
+                    }
+                    
+                    let http = methodCall["httpMethod"];
+                    let className;
+                    if (arr["implementedTypes"].length == 1){ 
+                        className = arr["implementedTypes"][0];
 
-                }
-                else{
-                    className = arr["name"];
-                }
-                let calledFrom = methodCall["calledFrom"];
-                let destination = methods[url]["microservice"];
-                let source = methodCall["microserviceName"];
-                let parameters = methodCall["parameterContents"];
-                let name = source.concat(" --> ", destination);
-                if (source != destination){
-                    // Check if this connection is already in 
-                    // connections array
-                    if (!(connections.includes(name))){
-                        connections.push(name);
-                        links.push(
-                            {
-                                "source": source,
-                                "target": destination,
-                                "nodeType": "link",
-                                "requests": [
+                    }
+                    else{
+                        className = arr["name"];
+                    }
+                    let calledFrom = methodCall["calledFrom"];
+                    let destination = methods[url]["microservice"];
+                    let source = microserviceName;
+                    let parameters = methodCall["parameterContents"];
+                    let name = source.concat(" --> ", destination);
+                    if (source != destination){
+                        // Check if this connection is already in 
+                        // connections array
+                        if (!(connections.includes(name))){
+                            connections.push(name);
+                            links.push(
+                                {
+                                    "source": source,
+                                    "target": destination,
+                                    "nodeType": "link",
+                                    "requests": [
+                                    {
+                                        "destinationUrl": url,
+                                        "sourceMethod": calledFrom,
+                                        "endpointFunction": methodCall["name"],
+                                        "className": className,
+                                        "destinationclassName": methods[url]["className"],
+                                        "type": http,
+                                        "argument": parameters,
+                                        "msReturn": methods[url]["returnType"],
+                                    }
+                                    ],
+                                    "name": name,
+                                    "type":"link",
+                                },
+                            )
+        
+                        }
+                        else{
+                            // The index of this connection in the connections array
+                            // is the same index in the links array. Find 
+                            // the link based on the index of the name in 
+                            // connections array and push a new object into 
+                            // the "requests" parameter
+                            links[connections.indexOf(name)]["requests"].push(
                                 {
                                     "destinationUrl": url,
                                     "sourceMethod": calledFrom,
@@ -117,34 +143,11 @@ export default function getData(myData, nodes_array){
                                     "argument": parameters,
                                     "msReturn": methods[url]["returnType"],
                                 }
-                                ],
-                                "name": name,
-                                "type":"link",
-                            },
-                        )
-    
-                    }
-                    else{
-                        // The index of this connection in the connections array
-                        // is the same index in the links array. Find 
-                        // the link based on the index of the name in 
-                        // connections array and push a new object into 
-                        // the "requests" parameter
-                        links[connections.indexOf(name)]["requests"].push(
-                            {
-                                "destinationUrl": url,
-                                "sourceMethod": calledFrom,
-                                "endpointFunction": methodCall["name"],
-                                "className": className,
-                                "destinationclassName": methods[url]["className"],
-                                "type": http,
-                                "argument": parameters,
-                                "msReturn": methods[url]["returnType"],
-                            }
-    
-                        )
-                    }
-                } 
+        
+                            )
+                        }
+                    } 
+                }
             }
         }
     }
@@ -157,8 +160,8 @@ export default function getData(myData, nodes_array){
         }
         let controllers = microservice["controllers"];
         let services = microservice["services"];
-        iterateThrough(services);
-        iterateThrough(controllers);
+        iterateThrough(services, nodeName);
+        iterateThrough(controllers, nodeName);
     }
 
     return {

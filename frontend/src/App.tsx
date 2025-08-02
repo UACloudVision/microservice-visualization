@@ -14,11 +14,10 @@ import { BrowserRouter, Router } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
+import IRFileUpload from "./components/IRFileUpload";
 
 import getData from "./getData";
 import compareChanges from "./getChanges.js";
-
-import files from './data/input.json';
 
 function App(data: any) {
     const graphRef = useRef();
@@ -36,11 +35,34 @@ function App(data: any) {
     const [isDark, setIsDark] = useState(true);
     const [trackChanges, setTrackChanges] = useState(true);
     const [graphName, setGraphName] = useState("test");
-    const [graphTimeline, setGraphTimeline] = useState<any[] | null>(null);
+    const [graphTimeline, setGraphTimeline] = useState<any[]>([]);
     const [currentInstance, setCurrentInstance] = useState<number>();
     const [defNodeColor, setDefNodeColor] = useState(false);
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
+
+    const onFileUpload = (file: File) => {
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+            resolve(reader.result as string);
+            };
+
+            reader.onerror = () => {
+            reject(reader.error);
+            };
+
+            reader.readAsText(file);
+        }).then((data: any) => {
+            const ir = JSON.parse(data);
+            setGraphTimeline(prev => [...prev, ir]);
+            if (typeof currentInstance == "undefined" || !graphTimeline) {
+                setGraphData(getData(ir, undefined));
+                setCurrentInstance(0);
+            }
+        });
+    }
 
     // For using backend
     //useEffect(() => {
@@ -55,7 +77,7 @@ function App(data: any) {
         //getGraphLifespan();
     //}, [graphName]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         // This function allows the user to input a file, which we call input.json (imported as the term files), containing a list of IR file names for the timeline to contain
         // The function will then grab the contents of each of those files and push them to a temp array before adding them to the graphtimeline. It must be done this way
         // The files called in input.json must be in frontend/public/data 
@@ -86,11 +108,16 @@ function App(data: any) {
         };
 
         getGraphLifespan();
-    }, [graphName]);
+    }, [graphName]);*/
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {
-        //Ideally just return a prompt to upload a file or use some default file
-        return null;
+        return (
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
+                </Routes>
+            </BrowserRouter>
+        )
     }
     return (
        <BrowserRouter >
@@ -109,7 +136,7 @@ function App(data: any) {
                 graphData={graphData}
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
-            />
+            />*
             
             {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
             <FilterBox
@@ -119,6 +146,8 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
                 trackChanges={trackChanges}
             ></FilterBox>
+
+            <IRFileUpload onFileSelect={onFileUpload} />
             
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
