@@ -112,19 +112,11 @@ function App(data: any) {
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         return (
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
-                </Routes>
-            </BrowserRouter>
-        )
+            <IRFileUpload onFileSelect={onFileUpload} fullscreen />
+        );
     }
     return (
-       <BrowserRouter >
-        <Routes>
-          <Route path="/" element=  
-        
-        {<div className={`max-w-full min-h-screen max-h-screen overflow-clip ${isDark ? `bg-gray-900` : `bg-gray-100`}`} ref={ref}>
+       <div className={`max-w-full min-h-screen max-h-screen overflow-clip ${isDark ? `bg-gray-900` : `bg-gray-100`}`} ref={ref}>
             {/* Upper left mode toggle */}
             <GraphMode
                 value={value}
@@ -138,14 +130,14 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
             />*
             
-            {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
+            {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box
             <FilterBox
                 key={`${currentInstance}-${trackChanges}`}
                 graphData={graphData} 
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
                 trackChanges={trackChanges}
-            ></FilterBox>
+            ></FilterBox>*/}
 
             <IRFileUpload onFileSelect={onFileUpload} />
             
@@ -234,11 +226,7 @@ function App(data: any) {
                 graphTimeline={graphTimeline}
                 currentInstance={currentInstance}
             />
-        </div>}
-        /> 
-        <Route path="/node" element={<NewPage/>}/>
-        </Routes>
-        </BrowserRouter>
+        </div>
     );
 }
 
