@@ -83,9 +83,10 @@ export default function FilterBox(values){
       navigate('/node', {state: JSON.stringify(connections)});
 
     }
+    
+    return null;
       
-      
-    return (
+    /*return (
       
         <div className="absolute top-2 right-2 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-52 max-h-full"
         style={styles.Bar}>
@@ -125,7 +126,7 @@ export default function FilterBox(values){
           
       </div>
       
-    );
+    );*/
   };
 
   

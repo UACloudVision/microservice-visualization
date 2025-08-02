@@ -19,8 +19,6 @@ import IRFileUpload from "./components/IRFileUpload";
 import getData from "./getData";
 import compareChanges from "./getChanges.js";
 
-import files from './data/input.json';
-
 function App(data: any) {
     const graphRef = useRef();
     const [search, setSearch] = useState("");
@@ -59,6 +57,10 @@ function App(data: any) {
         }).then((data: any) => {
             const ir = JSON.parse(data);
             setGraphTimeline(prev => [...prev, ir]);
+            if (typeof currentInstance == "undefined" || !graphTimeline) {
+                setGraphData(getData(ir, undefined));
+                setCurrentInstance(0);
+            }
         });
     }
 
@@ -75,7 +77,7 @@ function App(data: any) {
         //getGraphLifespan();
     //}, [graphName]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         // This function allows the user to input a file, which we call input.json (imported as the term files), containing a list of IR file names for the timeline to contain
         // The function will then grab the contents of each of those files and push them to a temp array before adding them to the graphtimeline. It must be done this way
         // The files called in input.json must be in frontend/public/data 
@@ -106,11 +108,16 @@ function App(data: any) {
         };
 
         getGraphLifespan();
-    }, [graphName]);
+    }, [graphName]);*/
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {
-        //Ideally just return a prompt to upload a file or use some default file
-        return null;
+        return (
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
+                </Routes>
+            </BrowserRouter>
+        )
     }
     return (
        <BrowserRouter >
