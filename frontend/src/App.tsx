@@ -15,9 +15,16 @@ import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 import IRFileUpload from "./components/IRFileUpload";
+import NotificationToast from "./components/NotificationToast";
 
-import getData from "./getData";
+import getData, { setNotificationCallback } from "./getData";
 import compareChanges from "./getChanges.js";
+
+interface Notification {
+    type: 'error' | 'warning' | 'success' | 'info';
+    message: string;
+    duration?: number;
+}
 
 function App(data: any) {
     const graphRef = useRef();
@@ -41,28 +48,60 @@ function App(data: any) {
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
 
-    const onFileUpload = (file: File) => {
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
+    // Notification state
+    const [notification, setNotification] = useState<Notification | null>(null);
 
-            reader.onload = () => {
-            resolve(reader.result as string);
-            };
-
-            reader.onerror = () => {
-            reject(reader.error);
-            };
-
-            reader.readAsText(file);
-        }).then((data: any) => {
-            const ir = JSON.parse(data);
-            setGraphTimeline(prev => [...prev, ir]);
-            if (typeof currentInstance == "undefined" || !graphTimeline) {
-                setGraphData(getData(ir, undefined));
-                setCurrentInstance(0);
-            }
+    // Set up notification callback when component mounts
+    useEffect(() => {
+        setNotificationCallback((notificationData: Notification) => {
+            setNotification(notificationData);
         });
+    }, []);
+
+    const onFileUpload = async (file: File) => {
+        try {
+            const data = await file.text();
+            let ir = JSON.parse(data);
+
+            const processedData = getData(ir, undefined);
+        
+            if (processedData) {
+                setGraphData(processedData);
+                setGraphTimeline(prev => [...prev, ir]);
+                if (typeof currentInstance === "undefined") {
+                    setCurrentInstance(0);
+                }
+
+                setNotification({
+                        type: 'success',
+                        message: 'IR file parsed successfully!',
+                        duration: 5000
+                    });
+                console.log("Validation failed. Toast should be visible.");
+
+            } else {
+                setNotification({
+                        type: 'error',
+                        message: 'File validation failed.',
+                        duration: 5000
+                    });
+                console.log("Validation failed. Toast should be visible.");
+            }
+
+        } catch (error: any) {
+            setNotification({
+                type: 'error',
+                message: `Failed to parse JSON: ${error.message}`,
+                duration: 5000
+            });
+            return;
+        }
+        
     }
+
+    const handleNotificationClose = () => {
+        setNotification(null);
+    };
 
     // For using backend
     //useEffect(() => {
@@ -116,6 +155,10 @@ function App(data: any) {
                 <Routes>
                     <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
                 </Routes>
+                <NotificationToast 
+                    notification={notification} 
+                    onClose={handleNotificationClose} 
+                />
             </BrowserRouter>
         )
     }
@@ -238,6 +281,12 @@ function App(data: any) {
         /> 
         <Route path="/node" element={<NewPage/>}/>
         </Routes>
+
+        <NotificationToast 
+            notification={notification} 
+            onClose={handleNotificationClose} 
+        />
+
         </BrowserRouter>
     );
 }

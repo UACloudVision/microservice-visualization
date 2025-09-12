@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
-import getData from "./getData.js";
+import getData from "./getData";
 import axios from "axios";
 
 

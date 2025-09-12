@@ -3,8 +3,8 @@ import React from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import getGraphData from "./getData.js";
-import myData from "./data/IR323_3138.json";
+import getGraphData from "./getData";
+// import myData from "./data/IR323_3138.json";
 import getConnections from "./createConnections.js"
 
 
