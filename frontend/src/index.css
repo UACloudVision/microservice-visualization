@@ -136,3 +136,25 @@
     pointer-events: all;
     position: relative;
 }
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(270deg, #3b83f697, #8a5cf6be, #3b83f6ac);
+  background-size: 600% 600%;
+  animation: gradientMove 8s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.animated-gradient-dark {
+  background: linear-gradient(270deg, #3b83f6e6, #8a5cf6e6, #3b83f6e6);
+  background-size: 600% 600%;
+  animation: gradientMove 8s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

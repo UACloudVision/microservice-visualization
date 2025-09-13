@@ -153,19 +153,30 @@ function App(data: any) {
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         return (
             <BrowserRouter>
-                <div className="min-h-screen bg-gray-100 relative">
-                    {/* Main content with bottom padding to prevent footer overlap */}
-                    <div className="pb-16">
-                        <Routes>
-                            <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
-                        </Routes>
-                        <NotificationToast 
-                            notification={notification} 
-                            onClose={handleNotificationClose} 
-                        />
+                <div className="min-h-screen bg-gray-100 relative flex flex-col">
+                    {/* Main content area */}
+                    <div className="flex-1 flex flex-col items-center justify-center relative z-10 -mt-96" >
+                        <h1 className="text-5xl font-extrabold mb-6 animated-gradient">
+                            CIMET IR VISUALIZER
+                        </h1>
+
+                        <div className="relative z-10 mt-10">
+                            <Routes>
+                            <Route
+                                path="/"
+                                element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />}
+                            />
+                            </Routes>
+                        </div>
                     </div>
-                    
-                    {/* Footer - only shows on fullscreen upload page */}
+
+                    {/* Toast floats independently */}
+                    <NotificationToast
+                    notification={notification}
+                    onClose={handleNotificationClose}
+                    />
+
+                    {/* Footer stays at bottom */}
                     <Footer />
                 </div>
             </BrowserRouter>

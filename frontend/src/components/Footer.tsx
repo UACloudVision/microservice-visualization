@@ -4,47 +4,35 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-purple-400 text-white py-3 px-6 z-40">
-      <div className="flex flex-wrap items-center justify-between text-sm">
-        {/* Left section - Copyright */}
+    <footer className="fixed bottom-0 left-0 right-0 bg-purple-400 text-white py-5 px-6 z-40">
+      <div className="relative flex items-center justify-between text-sm">
+        {/* Left section */}
         <div className="flex items-center space-x-4">
-          <span>© {currentYear} CIMET IR Visualizer. All rights reserved.</span>
+          <span>© {currentYear} CloudHubs. All rights reserved.</span>
         </div>
 
-        {/* Center section - Links */}
-        <div className="flex items-center space-x-6">
-          <a 
-            href="/docs" 
-            className="hover:text-blue-300 transition-colors cursor-pointer"
-          >
+        {/* Center section - absolutely centered */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-6">
+          <a href="/docs" className="hover:text-blue-300 transition-colors cursor-pointer">
             Documentation
           </a>
-          <a 
-            href="/privacy" 
-            className="hover:text-blue-300 transition-colors cursor-pointer"
-          >
+          <a href="/privacy" className="hover:text-blue-300 transition-colors cursor-pointer">
             Privacy Policy
           </a>
-          <a 
-            href="/terms" 
-            className="hover:text-blue-300 transition-colors cursor-pointer"
-          >
+          <a href="/terms" className="hover:text-blue-300 transition-colors cursor-pointer">
             Terms of Service
           </a>
-          <a 
-            href="/support" 
-            className="hover:text-blue-300 transition-colors cursor-pointer"
-          >
+          <a href="/support" className="hover:text-blue-300 transition-colors cursor-pointer">
             Support
           </a>
         </div>
 
-        {/* Right section - Version info */}
+        {/* Right section */}
         <div className="flex items-center space-x-4">
           <span className="text-gray-300">Version 1.0.1</span>
-          <a 
-            href="https://github.com/UACloudVision" 
-            target="_blank" 
+          <a
+            href="https://github.com/UACloudVision"
+            target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-300 transition-colors"
           >
@@ -55,7 +43,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile responsive - stack items on smaller screens */}
+      {/* Mobile layout stays as is */}
       <div className="md:hidden flex flex-col space-y-2 mt-2 text-center">
         <div className="flex justify-center space-x-4">
           <a href="/docs" className="hover:text-blue-300 transition-colors">Docs</a>

@@ -50,13 +50,13 @@ interface Controller {
     name: string;
 }
 
-interface Microservice {
+export interface Microservice {
     name: string;
     controllers: Controller[];
     services: Controller[]; // Services have the same structure as controllers
 }
 
-interface IRData {
+export interface IRData {
     microservices: Microservice[];
     commitID?: string;
 }

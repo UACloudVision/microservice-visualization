@@ -136,7 +136,7 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
             </div>
             
             {/* Progress bar */}
-            <div className="mt-3 w-full bg-black bg-opacity-20 rounded-full h-1">
+            {/* <div className="mt-3 w-full bg-black bg-opacity-20 rounded-full h-1">
                 <div 
                     className="bg-white h-1 rounded-full transition-all ease-linear"
                     style={{ 
@@ -144,7 +144,7 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
                         animation: `progressShrink ${notification.duration || 5000}ms linear forwards`
                     }}
                 />
-            </div>
+            </div> */}
 
             {/* Inline style for animation */}
             <style>
