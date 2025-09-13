@@ -57,7 +57,7 @@ const TimeSlider: React.FC<Props> = ({
 
     return (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 w-5/6 max-w-4xl">
-            <div className="bg-slate-800/70 text-white rounded-xl p-4 shadow-lg backdrop-blur-sm transition-all duration-300">
+            <div className="bg-slate-800/70 text-white rounded-xl p-4 shadow-lg backdrop-blur-none transition-all duration-300">
                 
                 {/* Header with title and collapse/expand button */}
                 <div className="relative mb-3">

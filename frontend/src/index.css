@@ -157,4 +157,5 @@
   animation: gradientMove 8s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(232, 253, 45, 0.3));
 }

@@ -97,7 +97,7 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
     return (
         <div 
             className={`
-                fixed top-4 right-4 z-50 max-w-sm p-4 rounded-lg shadow-lg text-white
+                fixed top-4 right-4 z-50 p-4 rounded-xl shadow-lg text-white backdrop-blur-sm
                 transform transition-all duration-300 ease-in-out
                 ${getBackgroundColor()}
                 ${isExiting ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0'}
@@ -106,14 +106,14 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
         >
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3">
-                    <span className="text-xl flex-shrink-0">
+                    <span className="text-2xl flex-shrink-0">
                         {getIcon()}
                     </span>
                     <div className="flex-1">
-                        <h4 className="font-semibold text-sm mb-1">
+                        <h4 className="font-semibold text-base mb-1">
                             {getTitle()}
                         </h4>
-                        <p className="text-sm leading-relaxed">
+                        <p className="text-sm leading-relaxed text-slate-200">
                             {notification.message}
                         </p>
                     </div>
@@ -126,7 +126,7 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
                             onClose();
                         }, 300);
                     }}
-                    className="ml-2 text-white hover:text-gray-200 transition-colors"
+                    className="ml-2 text-slate-300 hover:text-white transition-colors p-1"
                     aria-label="Close notification"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,15 +136,18 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
             </div>
             
             {/* Progress bar */}
-            {/* <div className="mt-3 w-full bg-black bg-opacity-20 rounded-full h-1">
+            {/* You can uncomment this to re-enable the progress bar */}
+            {/*
+            <div className="mt-4 w-full h-1 bg-white/20 rounded-full overflow-hidden">
                 <div 
-                    className="bg-white h-1 rounded-full transition-all ease-linear"
+                    className="h-full rounded-full bg-white transition-all ease-linear"
                     style={{ 
                         width: '100%',
                         animation: `progressShrink ${notification.duration || 5000}ms linear forwards`
                     }}
                 />
-            </div> */}
+            </div>
+            */}
 
             {/* Inline style for animation */}
             <style>
