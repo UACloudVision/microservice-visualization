@@ -16,8 +16,6 @@ const NotificationToast = ({ notification, onClose }: NotificationToastProps) =>
     const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
-        // console.log('NotificationToast received notification:', notification);
-
         if (notification && notification.message) {
             setIsVisible(true);
             setIsExiting(false);

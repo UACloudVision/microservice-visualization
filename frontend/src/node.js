@@ -1,91 +1,76 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import * as THREE from "three";
 import { useLocation } from 'react-router-dom';
+import Menu from "./components/graph/RightClickNodeMenu";
+import { InfoBox } from "./components/graph/NodeInfoBox";
+import React, { useEffect, useRef, useState } from "react";
 import GraphWrapper from "./components/graph/GraphWrapper";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
-import { InfoBox } from "./components/graph/NodeInfoBox";
-import Menu from "./components/graph/RightClickNodeMenu";
-import * as THREE from "three";
+
 import ForceGraph3D from "react-force-graph-3d";
-import { WebGL1Renderer } from "three";
-
-import axios from "axios";
-
-
 
 export default function Node(){
-    const location = useLocation();
-    const data=JSON.parse(location.state);
-    const graphRef = useRef();
-    const [search, setSearch] = useState("");
-    const [value, setValue] = useState(8);
-    const [initCoords, setInitCoords] = useState(null);
-    const [initRotation, setInitRotation] = useState(null);
-    const [graphData, setGraphData] = useState(data[0]);
-    const [is3d, setIs3d] = useState(true);
-    const [antiPattern, setAntiPattern] = useState(false);
-    const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
-    const [max, setMax] = useState(6);
-    const [color, setColor] = useState("dark-default");
-    const ref = useRef<HTMLDivElement>(null);
-    const [isDark, setIsDark] = useState(true);
-    const [graphName, setGraphName] = useState("test");
-    const [graphTimeline, setGraphTimeline] = useState(null);
-    const [currentInstance, setCurrentInstance] = useState(null);
-    const [defNodeColor, setDefNodeColor] = useState(false);
-    const [trackNodes, setTrackNodes] = useState([]);
-    const [focusNode, setFocusNode] = useState();
-    const microserviceColors = data[1];
-    const endpointCalls = data[2];
-    
-    
-    
-    
-        return (
-            <div className={`max-w-full min-h-screen max-h-screen overflow-clip ${
-                isDark ? `bg-gray-900` : `bg-gray-100`
-            }`}
-            
-            >  
-            <GraphWrapper
-                height={ref?.current?.clientHeight ?? 735}
-                width={ref?.current?.clientWidth ?? 1710}
-                search={search}
-                threshold={value}
-                graphRef={graphRef}
-                graphData={graphData}
-                setInitCoords={setInitCoords}
-                setInitRotation={setInitRotation}
-                is3d={is3d}
-                antiPattern={antiPattern}
-                colorMode={color}
-                defNodeColor={defNodeColor}
-                setDefNodeColor={setDefNodeColor}
-                setGraphData={setGraphData}
-                isDarkMode={isDark}
-                selectedAntiPattern={selectedAntiPattern}
-                trackNodes={trackNodes}
-                focusNode={focusNode}
-                endpointCalls={endpointCalls}
-            />
-             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
+  const location = useLocation();
+  const data=JSON.parse(location.state);
+  const graphRef = useRef();
+  const [search, setSearch] = useState("");
+  const [value, setValue] = useState(8);
+  const [initCoords, setInitCoords] = useState(null);
+  const [initRotation, setInitRotation] = useState(null);
+  const [graphData, setGraphData] = useState(data[0]);
+  const [is3d, setIs3d] = useState(true);
+  const [antiPattern, setAntiPattern] = useState(false);
+  const [selectedAntiPattern, setSelectedAntiPattern] = useState("none");
+  const [max, setMax] = useState(6);
+  const [color, setColor] = useState("dark-default");
+  const ref = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(true);
+  const [graphName, setGraphName] = useState("test");
+  const [graphTimeline, setGraphTimeline] = useState(null);
+  const [currentInstance, setCurrentInstance] = useState(null);
+  const [defNodeColor, setDefNodeColor] = useState(false);
+  const [trackNodes, setTrackNodes] = useState([]);
+  const [focusNode, setFocusNode] = useState();
+  const microserviceColors = data[1];
+  const endpointCalls = data[2];
+  
+  return (
+    <div className={`max-w-full min-h-screen max-h-screen overflow-clip ${
+        isDark ? `bg-gray-900` : `bg-gray-100`
+    }`}>  
 
-            <InfoBox
-                graphData={graphData}
-                focusNode={focusNode}
-                setFocusNode={setFocusNode}
-            />
-            <Legend 
-            microservices={microserviceColors}
-            
-            /> 
-            </div>
-            
-        
+    <GraphWrapper
+        height={ref?.current?.clientHeight ?? 735}
+        width={ref?.current?.clientWidth ?? 1710}
+        search={search}
+        threshold={value}
+        graphRef={graphRef}
+        graphData={graphData}
+        setInitCoords={setInitCoords}
+        setInitRotation={setInitRotation}
+        is3d={is3d}
+        antiPattern={antiPattern}
+        colorMode={color}
+        defNodeColor={defNodeColor}
+        setDefNodeColor={setDefNodeColor}
+        setGraphData={setGraphData}
+        isDarkMode={isDark}
+        selectedAntiPattern={selectedAntiPattern}
+        trackNodes={trackNodes}
+        focusNode={focusNode}
+        endpointCalls={endpointCalls}
+    />
+    
+    <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 
-        );
-
+    <InfoBox
+        graphData={graphData}
+        focusNode={focusNode}
+        setFocusNode={setFocusNode}
+    />
+    <Legend microservices={microserviceColors}/> 
+    </div>
+  );
 }
 
 function Legend(microservices) {
@@ -100,13 +85,10 @@ function Legend(microservices) {
     const repositoryRef = useRef();
     const entityRef = useRef();
    
-
-
     const toggleVisibility = () => {
       setIsVisible(!isVisible); 
     }
   
-    
     
     return (
     <div style={{
@@ -329,16 +311,12 @@ function Legend(microservices) {
       </li>
       <li>
       Endpoint Call: --{'>'}
-
       </li>
     </ul>
   
     </div>
       
       </>
-
-
-
     )}
     
   </div>

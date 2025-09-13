@@ -1,13 +1,8 @@
 "use client"
-import React from "react";
 import { useState } from "react";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import getGraphData from "./getData";
-// import myData from "./data/IR323_3138.json";
+import { useNavigate } from "react-router-dom";
 import getConnections from "./createConnections.js"
-
-
 
 function getData(data){
     
@@ -22,7 +17,9 @@ function getData(data){
   return [names, indices];
 }
 
-//The filter box that appears on the left side of the website, listing all of the microservices currently displayed. When you click filter it will then show the component view of those microservices
+//The filter box that appears on the left side of the website, 
+//listing all of the microservices currently displayed. 
+//When you click filter it will then show the component view of those microservices
 export default function FilterBox(values){
     const graphData = values["graphData"];
     const navigate = useNavigate();
@@ -30,11 +27,8 @@ export default function FilterBox(values){
     const [searchQuery, setSearchQuery] = useState('');
     const arr = getData(graphData);
     const [nodes, setNodes] = useState(arr[0])
-    //const [indices, setIndices] = useState(arr[1])
     const [selectedIds, setSelectedIds] = useState(arr[0]);
   
-
-
     function handleCheckboxChange(node) {
       if (selectedIds.includes(node)){
         setSelectedIds(selectedIds => selectedIds.filter(item => item !== node));

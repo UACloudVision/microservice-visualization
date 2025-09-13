@@ -2,7 +2,6 @@ import { saveAs } from "file-saver";
 import React, { useState } from "react";
 import { reset } from "../../utils/GraphFunctions";
 import axios from "axios";
-import myData from "../../data/mock1.json";
 
 type ButtonProps = {
     onClick: any;

@@ -16,6 +16,7 @@ import { Route } from "react-router-dom";
 import NewPage from "./node.js";
 import IRFileUpload from "./components/IRFileUpload";
 import NotificationToast from "./components/NotificationToast";
+import Footer from "./components/Footer";
 
 import getData, { setNotificationCallback } from "./getData";
 import compareChanges from "./getChanges.js";
@@ -152,13 +153,21 @@ function App(data: any) {
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         return (
             <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
-                </Routes>
-                <NotificationToast 
-                    notification={notification} 
-                    onClose={handleNotificationClose} 
-                />
+                <div className="min-h-screen bg-gray-100 relative">
+                    {/* Main content with bottom padding to prevent footer overlap */}
+                    <div className="pb-16">
+                        <Routes>
+                            <Route path="/" element={<IRFileUpload onFileSelect={onFileUpload} fullscreen />} />
+                        </Routes>
+                        <NotificationToast 
+                            notification={notification} 
+                            onClose={handleNotificationClose} 
+                        />
+                    </div>
+                    
+                    {/* Footer - only shows on fullscreen upload page */}
+                    <Footer />
+                </div>
             </BrowserRouter>
         )
     }
@@ -246,7 +255,7 @@ function App(data: any) {
                 setFocusNode={setFocusNode}
             />
             {/* Bottom left "color by" box */}
-            {!antiPattern ? (
+            {/* {!antiPattern ? (
                 <ColorSelector
                     value={value}
                     setValue={setValue}
@@ -256,7 +265,7 @@ function App(data: any) {
                 />
             ) : (
                 <></>
-            )}
+            )} */}
 
             <div className="flex flex-row items-center justify-center w-full">
                 {/* Timeline slider on bottom of the screen */}
