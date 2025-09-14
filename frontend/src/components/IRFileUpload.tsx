@@ -94,11 +94,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, fullscreen }) => 
           text-center text-white
           hover:shadow-xl transition-shadow
           `}>
+          
           {/* Header with Icon */}
           <h2 className="text-xl font-semibold text-white flex items-center gap-2 animated-gradient-dark">
               Upload Additional Files
           </h2>
           <div className="w-full h-px bg-slate-700"></div>
+          
           {/* File Drop Area */}
           <div {...getRootProps({
               className:

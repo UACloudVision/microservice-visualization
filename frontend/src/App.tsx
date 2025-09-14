@@ -49,6 +49,10 @@ function App(data: any) {
     const [trackNodes, setTrackNodes] = useState([]);
     const [focusNode, setFocusNode] = useState();
 
+    // Show all states
+    const [expandedNodes, setExpandedNodes] = useState(new Set<string>());
+    const [isExpandedAll, setIsExpandedAll] = useState(false); 
+
     // Notification state
     const [notification, setNotification] = useState<Notification | null>(null);
 
@@ -58,6 +62,22 @@ function App(data: any) {
             setNotification(notificationData);
         });
     }, []);
+
+    useEffect(() => { // <-- NEW
+        if (!graphData || !graphData.nodes) return;
+
+        if (isExpandedAll) {
+            // If toggled ON, find all microservice IDs and expand them
+            const allMicroserviceIds = graphData.nodes
+                .filter((node) => node.nodeType === 'microservice')
+                .map((node) => node.nodeName);
+            
+            setExpandedNodes(new Set(allMicroserviceIds));
+        } else {
+            // If toggled OFF, clear all expansions
+            setExpandedNodes(new Set());
+        }
+    }, [isExpandedAll, graphData?.nodes]);
 
     const onFileUpload = async (file: File) => {
         try {
@@ -233,6 +253,8 @@ function App(data: any) {
                 selectedAntiPattern={selectedAntiPattern}
                 currentInstance={currentInstance}
                 graphTimeline={graphTimeline}
+                isExpandedAll={isExpandedAll}
+                setIsExpandedAll={setIsExpandedAll} 
             />
             {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
             <GraphWrapper
@@ -256,6 +278,9 @@ function App(data: any) {
                 focusNode={focusNode}
                 endpointCalls={[]}
                 trackChanges={trackChanges}
+                expandedNodes={expandedNodes}
+                setExpandedNodes={setExpandedNodes}
+                
             />
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 

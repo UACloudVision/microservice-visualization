@@ -14,6 +14,12 @@ const IN_PATTERN = "rgb(235,52,192)";
 const LINK_FROM_HOVER = "rgba(52, 143, 235,1)";
 const LINK_TO_HOVER = "rgba(179, 66, 245,1)";
 
+const NODE_COLORS = {
+    "microservice": LIGHT_GRAY,
+    "controller": LINK_TO_HOVER,
+    "method": HOVER_BLUE
+}
+
 function getShape(type: String): number {
     if (type === "service") {
         return 0;
@@ -77,6 +83,12 @@ function getColor(
             return HOVER_NEIGHBOR;
         }
     }
+
+    const nodeType = node.nodeType as keyof typeof NODE_COLORS;
+    if(NODE_COLORS[nodeType]) {
+        return NODE_COLORS[nodeType];
+    }
+
     if (focusNode) {
         if (focusNode.node === node.nodeName) {
             return HOVER_BLUE;
@@ -337,6 +349,7 @@ const getNodeOpacity = (
     focusNode: any
 ): number => {
     const FOCUS_ACTIVE_NOT_SELECTED = 0.05;
+    // When the search is inactive.
     if (search === "") {
         if (
             focusNode &&
@@ -345,7 +358,7 @@ const getNodeOpacity = (
                     (neighbor: any) => neighbor === node.nodeName
                 ))
         ) {
-            return 0.9;
+            return 1.0;
         }
         if (highlightNodes.size === 0) {
             if (focusNode) {
@@ -358,8 +371,10 @@ const getNodeOpacity = (
             : focusNode
             ? FOCUS_ACTIVE_NOT_SELECTED
             : 0.5;
-    } else if (node.nodeName.toLowerCase().includes(search.toLowerCase())) {
-        return 0.9;
+    } 
+    // When the search is active.
+    else if (node.nodeName.toLowerCase().includes(search.toLowerCase())) {
+        return 1.0;
     } else if (
         focusNode &&
         (focusNode.node === node.nodeName ||
@@ -421,7 +436,7 @@ function getLinkOpacity(
             link.target.nodeName.toLowerCase().includes(search.toLowerCase())
         ) {
             if (threed) {
-                return 0.9;
+                return 1.0;
             }
         } else {
             if (threed) {
@@ -436,7 +451,7 @@ function getLinkOpacity(
             link.source.nodeName === focusNode.node ||
             link.target.nodeName === focusNode.node
         ) {
-            return 0.9;
+            return 1.0;
         } else {
             return 0.2;
         }
@@ -458,6 +473,9 @@ function getLinkColor(
     focusNode: any,
     showChanges: any)
 {  
+    if (link.nodeType === 'hierarchy') {
+        return 'rgba(150, 150, 150, 0.5)'; 
+    }
     if (
         link.source.nodeName === hoverNode ||
         (focusNode && link.source.nodeName === focusNode.node)
@@ -528,6 +546,10 @@ function getLinkWidth(
     antiPattern: boolean,
     selectedAntiPattern: string
 ) {
+    if (link.nodeType === 'hierarchy') {
+        return 1; 
+    }
+
     let size = (link.requests?.length ?? 0) + 2;
     if (antiPattern) {
         if (

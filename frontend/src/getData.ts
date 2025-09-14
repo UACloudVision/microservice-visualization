@@ -77,8 +77,16 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             return null;
         }
         
-        let nodes: Array<{ nodeName: string; nodeType: string }> = [];
+        let nodes: Array<{ 
+            nodeName: string; 
+            nodeType: string;
+            displayName: string;
+            parentMicroservice: string | null;
+            parentController: string | null }> = [];
         let methods: { [key: string]: any } = {};
+
+        let connections = new Map<string, number>();
+        let links: any[] = [];
 
         // Pre-filtering for performance optimization.
         let filteredMicroservices = nodes_array 
@@ -97,7 +105,10 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             if (nodes_array == undefined || nodes_array.includes(nodeName)){
                 nodes.push({
                     "nodeName": nodeName,
-                    "nodeType": "microservice"
+                    "displayName": nodeName,
+                    "nodeType": "microservice",
+                    "parentMicroservice": null,
+                    "parentController": null
                 });
 
             }
@@ -108,15 +119,48 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             let controllers = microservice["controllers"];
             for (let j=0; j<controllers.length; j++){
                 let controller = controllers[j];
+                let controllerUniqueName = `${nodeName}.${controller["name"]}`;
+                nodes.push({
+                    "nodeName": controllerUniqueName,
+                    "displayName": controller["name"],
+                    "nodeType": "controller", // New node type
+                    "parentMicroservice": nodeName, // Add parent for hierarchy
+                    "parentController": null
+                });
+
+                links.push({
+                    source: nodeName, // The parent microservice
+                    target: controllerUniqueName,
+                    name: `${nodeName}->${controllerUniqueName}`,
+                    nodeType: "hierarchy" // A new type for styling
+                });
+
                 let functions = controller["methods"];
                 
                 for (let k=0; k<functions.length; k++){
                     let method = functions[k];
+                    let url = method["url"];
+                    let http = method["httpMethod"];
                     let methodName = method["name"];
                     let parameters = method["parameters"];
                     let returnType = method["returnType"];
-                    let url = method["url"];
-                    let http = method["httpMethod"];
+                    
+                    let fullMethodName = `${nodeName}.${controller["name"]}.${methodName}_${k}`;
+
+                    nodes.push({
+                        "nodeName": fullMethodName,
+                        "nodeType": "method",
+                        "displayName": methodName,
+                        "parentController": controllerUniqueName,
+                        "parentMicroservice": nodeName
+                    });
+
+                    links.push({
+                        source: controllerUniqueName, // The parent controller
+                        target: fullMethodName,
+                        name: `${controllerUniqueName}->${fullMethodName}`,
+                        nodeType: "hierarchy" // A new type for styling
+                    });
                     
                     //Check if this method has a default annotation, then also add that url
                     if (method["annotations"].length > 0 && 
@@ -144,9 +188,6 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             }
         }
 
-        let connections = new Map<string, number>();
-        let links: any[] = [];
-
         // The map can be controller or service
         const iterateThrough = (array: Controller[], microserviceName: string): void => {
             for (let i=0; i<array.length; i++){
@@ -154,7 +195,8 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                 let funcs = arr["methods"];
                 
                 for (let i = 0; i < funcs.length; i++) {
-                    let methodCalls = funcs[i]["methodCalls"];
+                    let func = funcs[i];
+                    let methodCalls = func["methodCalls"];
                     
                     for (let i=0; i<methodCalls.length; i++){
                         let methodCall = methodCalls[i];
@@ -236,7 +278,7 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             let nodeName = microservice["name"];
             let controllers = microservice["controllers"];
             let services = microservice["services"];
-            
+
             iterateThrough(services, nodeName);
             iterateThrough(controllers, nodeName);
         }

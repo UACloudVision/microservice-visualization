@@ -24,6 +24,9 @@ type Props = {
     focusNode: any;
     endpointCalls: any;
     trackChanges: any;
+    
+    expandedNodes: Set<string>;
+    setExpandedNodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
 const VisualizationOptions: React.FC<Props> = ({
@@ -47,6 +50,8 @@ const VisualizationOptions: React.FC<Props> = ({
     focusNode,
     endpointCalls,
     trackChanges,
+    expandedNodes,
+    setExpandedNodes,
 }) => {
     const Shared2D3DProps: SharedProps = {
         linkDirectionalArrowRelPos: 1,
@@ -94,6 +99,8 @@ const VisualizationOptions: React.FC<Props> = ({
                 focusNode={focusNode}
                 endpointCalls={endpointCalls}
                 trackChanges={trackChanges}
+                expandedNodes={expandedNodes}
+                setExpandedNodes={setExpandedNodes}
             />
         </div>
     );
