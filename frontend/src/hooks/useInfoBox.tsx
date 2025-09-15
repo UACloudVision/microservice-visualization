@@ -11,94 +11,110 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
     const [patterns, setAntiPatterns] = useState<any[]>();
     let node;
     const [methods, setMethods] = useState<any[]>();
+    const [parameters, setParameters] = useState<any[]>();
     const [source, setSource] = useState<String>();
     const [destination, setDestination] = useState<String>();
 
-    const handleClick = useCallback(
+    const handleLinkClick = useCallback(
         (event: any) => {
-            setAntiPatterns([]); // Change later
             console.log(event);
-            node = event.detail.node;
-            // different popup for link
-            if (node["nodeType"] == "link"){
-                setAnchorPoint({ x: event.pageX, y: event.pageY });
-                setName(node.name);
-                setType("link");
-                setFocusNode({
-                    node: event.detail.node.source.nodeName,
-                    neighbors: [node.target]
-                });
-                
-                setDependencies([node]);
-                setDepends([]);
-                //setAntiPatterns(event.detail.node.patterns)
-                setShow(true);
-                if (node.source.nodeType == "microservice"){
-                    setSource(node.source.nodeName);
-                    setDestination(node.target.nodeName);
+            node = event.detail.link;
 
-                }
-                else{
-                    setSource(node.source.microserviceName);
-                    setDestination(node.target.microserviceName);
+            setAnchorPoint({ x: event.pageX, y: event.pageY });
+            setName(node.name);
+            setType("link");
+            setFocusNode({
+                node: event.detail.link.source.nodeName,
+                neighbors: [node.target]
+            });
+            
+            setDependencies([node]);
+            setDepends([]);
+            //setAntiPatterns(event.detail.node.patterns)
+            setShow(true);
+            if (node.source.nodeType == "microservice"){
+                setSource(node.source.nodeName);
+                setDestination(node.target.nodeName);
 
-                }
-                
             }
             else{
-                if (node.nodeType != "microservice"){
-                    setMethods(node.methods);
-                    setSource(node.microserviceName)
-                }
-                setAnchorPoint({ x: event.pageX, y: event.pageY });
-                setName(event.detail.node.nodeName);
-                setType(event.detail.node.nodeType);
-
-                let neighbors = getNeighbors(
-                    event.detail.node,
-                    graphData.nodes,
-                    graphData.links
-                );
-                console.log(neighbors);
-            
-                const neighborNames = neighbors.nodes.map(
-                (node: any) => node.nodeName
-                );
-
-                setFocusNode({
-                node: event.detail.node.nodeName,
-                    neighbors: neighborNames,
-                });
-
-                const dependsOn = neighbors.nodeLinks
-                    .filter(
-                        (link: any) =>
-                            event.detail.node.nodeName === link.target.nodeName
-                    )
-                    .map((link: any) => link);
-                const dependencies = neighbors.nodeLinks
-                    .filter(
-                        (link: any) =>
-                            event.detail.node.nodeName === link.source.nodeName
-                    )
-                    .map((link: any) => link);
-                console.log(dependsOn);
-                console.log(dependencies);
-                setDependencies(dependencies);
-                setDepends(dependsOn);
-                //setAntiPatterns(event.detail.node.patterns)
-                setShow(true);
+                setSource(node.source.microserviceName);
+                setDestination(node.target.microserviceName);
 
             }
-            
-        },
-        [setShow, setAnchorPoint]
+        }, [setShow, setAnchorPoint, setName, setType, 
+            setFocusNode, setDependencies, setDepends, setSource, setDestination]
     );
 
-    // const handleLClick = useCallback(
-    //     () => (show ? setShow(false) : null),
-    //     [show]
-    // );
+    const handleNodeClick = useCallback((event: any) => {
+        // Clear previous state
+        setAntiPatterns([]);
+        setMethods([]);
+        setParameters([]);
+        setSource(undefined);
+        
+        const node = event.detail.node;
+        if (!node) return;
+
+        // Handling different node types.
+        switch (node.nodeType) {
+            case 'microservice':
+                // No specific details like methods or parent source to set
+                break;
+
+            case 'controller': {
+                // Set the parent microservice name
+                setSource(node.parentMicroservice);
+                
+                // Finding all method nodes that belong to this controller.
+                const controllerMethods = graphData.nodes.filter(
+                    (n: any) => n.nodeType === 'method' && n.parentController === node.nodeName
+                );
+                setMethods(controllerMethods);
+                break;
+            }
+
+            case 'method':
+                // A method belongs to a microservice, but has no methods of its own
+                setSource(node.parentMicroservice);
+                setParameters(node.parameters);
+                break;
+        }
+
+        // Common logic for all node types.
+        setAnchorPoint({ x: event.pageX, y: event.pageY });
+        // Using displayName for better readability.
+        setName(node.displayName || node.nodeName); 
+        setType(node.nodeType);
+
+        const neighbors = getNeighbors(
+            node,
+            graphData.nodes,
+            graphData.links
+        );
+        
+        const neighborNames = neighbors.nodes.map((n: any) => n.nodeName);
+
+        setFocusNode({
+            node: node.nodeName,
+            neighbors: neighborNames,
+        });
+
+        const dependsOn = neighbors.nodeLinks.filter(
+            (link: any) => node.nodeName === link.target.nodeName
+        );
+
+        const dependencies = neighbors.nodeLinks.filter(
+            (link: any) => node.nodeName === link.source.nodeName
+        );
+
+        setDependencies(dependencies);
+        setDepends(dependsOn);
+        //setAntiPatterns(node.patterns)
+        setShow(true);
+
+    }, [graphData, setShow, setAnchorPoint, setMethods, setSource, 
+        setParameters, setName, setType, setFocusNode, setDependencies, setDepends]);
 
     useEffect(() => {
         if (!show) {
@@ -107,13 +123,14 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
     }, [show]);
 
     useEffect(() => {
-        document.addEventListener("nodeClick", handleClick);
-        // document.addEventListener("click", handleLClick);
+        document.addEventListener("nodeClick", handleNodeClick);
+        document.addEventListener("linkClick", handleLinkClick);
+
         return () => {
-            document.removeEventListener("nodeClick", handleClick);
-            // document.removeEventListener("click", handleLClick);
+            document.removeEventListener("nodeClick", handleNodeClick);
+            document.removeEventListener("linkClick", handleLinkClick);
         };
-    });
+    }, [handleNodeClick, handleLinkClick]);
 
     return {
         anchorPoint,
@@ -126,6 +143,7 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
         patterns,
         methods,
         source, 
-        destination
+        destination,
+        parameters
     };
 };

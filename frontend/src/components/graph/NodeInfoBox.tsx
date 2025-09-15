@@ -11,7 +11,7 @@ type Props = {
 
 //Info box shown when you click on a link or a node
 export const InfoBox = (props: Props) => {
-    const { anchorPoint, show, name, type, depends, setShow, dependencies, patterns, methods, source, destination} =
+    const { anchorPoint, show, name, type, depends, setShow, dependencies, patterns, methods, source, destination, parameters} =
         useInfoBox(props.graphData, props.setFocusNode);
 
     const getColorClass = (color: string) => {
@@ -152,8 +152,19 @@ export const InfoBox = (props: Props) => {
         >
             <div className="flex flex-col gap-2">
                 <h4 className="text-lg font-semibold border-b border-slate-300 pb-2 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-400">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.5m4.5 4.5V18m4.5 3v-4.5m4.5 0a2.25 2.25 0 00-2.25-2.25H15m0-1.5-3-3-3 3M21 15h-3.375M15 15h-3.375M18.75 3a2.25 2.25 0 00-2.25 2.25V15m2.25-11.25H12M9 3v13.5m-3-13.5V12M3 15.75V12" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-5 text-gray-400"
+                        >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M21 7.5l-9-4.5-9 4.5M21 7.5v9l-9 4.5m9-13.5l-9 4.5m-9-4.5v9l9 4.5m-9-13.5l9 4.5"
+                        />
                     </svg>
                     Node Details
                 </h4>
@@ -165,58 +176,73 @@ export const InfoBox = (props: Props) => {
             </div>
 
             <div className="w-full h-px bg-slate-300 my-2"></div>
-
-            <div className="max-h-96 w-96 overflow-y-scroll dark-scrollbar">
+            
+            {type == 'method' ? (
+                <div>
+                    <div className="font-medium mb-2">Parameters:</div>
+                    <div className="max-h-20 overflow-y-scroll dark-scrollbar p-4 rounded-xl border border-slate-300 shadow-sm bg-white/90 backdrop-blur-sm">
+                        {parameters && parameters.length > 0 ? (
+                            <span className="text-sm break-words whitespace-pre-wrap">
+                                {JSON.stringify(parameters, null, 2)}
+                            </span>
+                        ) : (
+                            <span className="text-sm text-slate-500">None</span>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="max-h-96 w-96 overflow-y-scroll dark-scrollbar">
                 <div className="font-medium mb-2">Methods:</div>
-                {methods && methods.length > 0 ? (
-                    methods.map((method: any) => (
-                        <CollapsableBox
-                            key={method.id}
-                            title={method.name}
-                            svg={arrowSvg}
-                            body={
-                                method ? (
-                                    <ul
-                                        className={`mb-4 p-4 rounded-xl border border-slate-300 shadow-sm
-                                            bg-white/90 backdrop-blur-sm`}
-                                    >
-                                        <div className="flex flex-col gap-3">
-                                            {method.url && method.httpMethod && (
-                                                <>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs text-slate-500">HTTP Method</span>
-                                                        <span className="font-semibold text-sm text-slate-700">{method.httpMethod}</span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs text-slate-500">URL</span>
-                                                        <span className="font-normal text-sm break-words">{method.url}</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-xs text-slate-500">Return Type</span>
-                                                <span className="font-mono text-cyan-600 text-sm break-words">{method.returnType ? method.returnType : 'None'}</span>
+                    {methods && methods.length > 0 ? (
+                        methods.map((method: any) => (
+                            <CollapsableBox
+                                key={method.id}
+                                title={(method.name || method.displayName)}
+                                svg={arrowSvg}
+                                body={
+                                    method ? (
+                                        <ul
+                                            className={`mb-4 p-4 rounded-xl border border-slate-300 shadow-sm
+                                                bg-white/90 backdrop-blur-sm`}
+                                        >
+                                            <div className="flex flex-col gap-3">
+                                                {method.url && method.httpMethod && (
+                                                    <>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-xs text-slate-500">HTTP Method</span>
+                                                            <span className="font-semibold text-sm text-slate-700">{method.httpMethod}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-xs text-slate-500">URL</span>
+                                                            <span className="font-normal text-sm break-words">{method.url}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-xs text-slate-500">Return Type</span>
+                                                    <span className="font-mono text-cyan-600 text-sm break-words">{method.returnType ? method.returnType : 'None'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-xs text-slate-500">Parameters</span>
+                                                    <span className="text-sm break-words whitespace-pre-wrap">{JSON.stringify(method.parameters, null, 2)}</span>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-xs text-slate-500">Parameters</span>
-                                                <span className="text-sm break-words">{JSON.stringify(method.parameters)}</span>
-                                            </div>
-                                        </div>
-                                    </ul>
-                                ) : (
-                                    <div>None</div>
-                                )
-                            }
-                            initOpen={false}
-                        />
-                    ))
-                ) : (
-                    <div>None</div>
-                )}
-            </div>
-
+                                        </ul>
+                                    ) : (
+                                        <div>None</div>
+                                    )
+                                }
+                                initOpen={false}
+                            />
+                        ))
+                    ) : (
+                        <div>None</div>
+                    )}
+                </div>
+            )}
+            
             <div className="w-full h-px bg-slate-300 my-2"></div>
-
+            
             <button
                 onClick={() => {
                     props.setFocusNode(null);
@@ -328,14 +354,37 @@ export const InfoBox = (props: Props) => {
                                             >
                                                 <div className="flex flex-col gap-1 mb-2">
                                                     <h5 className="font-semibold text-base flex items-center gap-2">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-gray-400">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21v-4.5m-1.226-9.678l-1.921-.514A.75.75 0 008.312 6l-4.312 3.45a.75.75 0 00-.215 1.027l1.962 1.57a.75.75 0 00.974-.248l.515-1.921a.75.75 0 00-.132-1.355zM15.541 7.21l1.921-.514a.75.75 0 01.132-1.355l-4.312-3.45a.75.75 0 00-1.027.215l-1.57 1.962a.75.75 0 00.974.248l.515-1.921a.75.75 0 00.132-1.355z" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={1.5}
+                                                            stroke="currentColor"
+                                                            className="w-4 h-4 text-gray-400"
+                                                            >
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6.75L21.75 12l-5.25 5.25M7.5 17.25L2.25 12l5.25-5.25" />
                                                         </svg>
                                                         Source Method: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
                                                     </h5>
                                                     <h5 className="font-semibold text-base flex items-center gap-2">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-gray-400">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125S7.722 2.25 12 2.25s8.25 1.847 8.25 4.125zm-16.5 6.375v2.25c0 2.278 3.694 4.125 8.25 4.125s8.25-1.847 8.25-4.125v-2.25m-16.5 0c0 2.278 3.694 4.125 8.25 4.125s8.25-1.847 8.25-4.125m-16.5 0v2.25c0 2.278 3.694 4.125 8.25 4.125s8.25-1.847 8.25-4.125v-2.25" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={1.5}
+                                                            stroke="currentColor"
+                                                            className="w-4 h-4 text-gray-400"
+                                                            >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                                                            />
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                                                            />
                                                         </svg>
                                                         Destination Method: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
                                                     </h5>

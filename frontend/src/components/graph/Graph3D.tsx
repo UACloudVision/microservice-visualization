@@ -164,6 +164,14 @@ const Graph: React.FC<Props> = ({
         setHighlightLinks(newHighlightLinks);
     };
 
+    // On link click.
+    const handleLinkClick = useCallback((link: any) => {
+        const event = new CustomEvent("linkClick", {
+            detail: { link: link },
+        });
+        document.dispatchEvent(event);
+    }, []);
+
     // On node left click - zoom in on the node and pull up info box
     const handleNodeClick = useCallback((node: any) => {
         // If a timeout is already running, it means this is a double-click
@@ -304,7 +312,7 @@ const Graph: React.FC<Props> = ({
             
             // General props
             backgroundColor={"rgba(0,0,0,0)"}
-            onLinkClick={handleNodeClick}
+            onLinkClick={handleLinkClick}
             onNodeHover={handleNodeHover}
             onLinkHover={handleLinkHover}
         />

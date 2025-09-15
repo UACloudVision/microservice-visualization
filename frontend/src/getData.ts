@@ -25,7 +25,7 @@ function showError(message: string): void {
 }
 
 // Define types for better type safety
-interface Method {
+export interface Method {
     name: string;
     parameters: any[];
     returnType: string;
@@ -36,7 +36,7 @@ interface Method {
     methodCalls: MethodCall[];
 }
 
-interface MethodCall {
+export interface MethodCall {
     url?: string;
     httpMethod: string;
     calledFrom: string;
@@ -44,7 +44,7 @@ interface MethodCall {
     parameterContents: any[];
 }
 
-interface Controller {
+export interface Controller {
     methods: Method[];
     implementedTypes: string[];
     name: string;
@@ -82,7 +82,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             nodeType: string;
             displayName: string;
             parentMicroservice: string | null;
-            parentController: string | null }> = [];
+            parentController: string | null 
+            parameters: any[] | null,
+            returnType: string | null }> = [];
         let methods: { [key: string]: any } = {};
 
         let connections = new Map<string, number>();
@@ -108,7 +110,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     "displayName": nodeName,
                     "nodeType": "microservice",
                     "parentMicroservice": null,
-                    "parentController": null
+                    "parentController": null,
+                    "parameters": [],
+                    "returnType": null
                 });
 
             }
@@ -125,7 +129,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     "displayName": controller["name"],
                     "nodeType": "controller", // New node type
                     "parentMicroservice": nodeName, // Add parent for hierarchy
-                    "parentController": null
+                    "parentController": null,
+                    "parameters": null,
+                    "returnType": null
                 });
 
                 links.push({
@@ -152,7 +158,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                         "nodeType": "method",
                         "displayName": methodName,
                         "parentController": controllerUniqueName,
-                        "parentMicroservice": nodeName
+                        "parentMicroservice": nodeName,
+                        "parameters": parameters,
+                        "returnType": returnType
                     });
 
                     links.push({
