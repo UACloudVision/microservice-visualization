@@ -236,32 +236,33 @@ function App(data: any) {
 
             <Instructions />
             
-            {/* Graph Menu on upper right with buttons */}
-            <GraphMenu
-                graphRef={graphRef}
-                search={search}
-                setSearch={setSearch}
-                value={value}
-                setValue={setValue}
-                graphData={graphData}
-                setGraphData={setGraphData}
-                initCoords={initCoords}
-                initRotation={initRotation}
-                is3d={is3d}
-                setIs3d={setIs3d}
-                isDark={isDark}
-                setIsDark={setIsDark}
-                trackChanges={trackChanges}
-                setTrackChanges={setTrackChanges}
-                antiPattern={antiPattern}
-                selectedAntiPattern={selectedAntiPattern}
-                currentInstance={currentInstance}
-                graphTimeline={graphTimeline}
-                isExpandedAll={isExpandedAll}
-                setIsExpandedAll={setIsExpandedAll} 
-            />
-            {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
             <ErrorBoundary setNotification={setNotification}>
+                {/* Graph Menu on upper right with buttons */}
+                <GraphMenu
+                    graphRef={graphRef}
+                    search={search}
+                    setSearch={setSearch}
+                    value={value}
+                    setValue={setValue}
+                    graphData={graphData}
+                    setGraphData={setGraphData}
+                    initCoords={initCoords}
+                    initRotation={initRotation}
+                    is3d={is3d}
+                    setIs3d={setIs3d}
+                    isDark={isDark}
+                    setIsDark={setIsDark}
+                    trackChanges={trackChanges}
+                    setTrackChanges={setTrackChanges}
+                    antiPattern={antiPattern}
+                    selectedAntiPattern={selectedAntiPattern}
+                    currentInstance={currentInstance}
+                    graphTimeline={graphTimeline}
+                    isExpandedAll={isExpandedAll}
+                    setIsExpandedAll={setIsExpandedAll} 
+                />
+                {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
+            
                 <GraphWrapper
                     height={ref?.current?.clientHeight ?? 735}
                     width={ref?.current?.clientWidth ?? 1710}
@@ -287,48 +288,48 @@ function App(data: any) {
                     setExpandedNodes={setExpandedNodes}
                     
                 />
-            </ErrorBoundary>
+            
+                <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 
-            <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
-
-            {/* left click node pop up box */}
-            <InfoBox
-                graphData={graphData}
-                focusNode={focusNode}
-                setFocusNode={setFocusNode}
-            />
-            {/* Bottom left "color by" box */}
-            {/* {!antiPattern ? (
-                <ColorSelector
-                    value={value}
-                    setValue={setValue}
-                    color={color}
-                    setColor={setColor}
-                    isDarkMode={isDark}
+                {/* left click node pop up box */}
+                <InfoBox
+                    graphData={graphData}
+                    focusNode={focusNode}
+                    setFocusNode={setFocusNode}
                 />
-            ) : (
-                <></>
-            )} */}
+                {/* Bottom left "color by" box */}
+                {/* {!antiPattern ? (
+                    <ColorSelector
+                        value={value}
+                        setValue={setValue}
+                        color={color}
+                        setColor={setColor}
+                        isDarkMode={isDark}
+                    />
+                ) : (
+                    <></>
+                )} */}
 
-            <div className="flex flex-row items-center justify-center w-full">
-                {/* Timeline slider on bottom of the screen */}
-                <TimeSlider
-                    max={max}
-                    setGraphData={setGraphData}
+                <div className="flex flex-row items-center justify-center w-full">
+                    {/* Timeline slider on bottom of the screen */}
+                    <TimeSlider
+                        max={max}
+                        setGraphData={setGraphData}
+                        graphTimeline={graphTimeline}
+                        currentInstance={currentInstance}
+                        setCurrentInstance={setCurrentInstance}
+                        setDefNodeColor={setDefNodeColor}
+                        trackChanges={trackChanges}
+                    />
+                </div>
+                <TrackNodeMenu
+                    trackNodes={trackNodes}
+                    setTrackNodes={setTrackNodes}
+                    graphData={graphData}
                     graphTimeline={graphTimeline}
                     currentInstance={currentInstance}
-                    setCurrentInstance={setCurrentInstance}
-                    setDefNodeColor={setDefNodeColor}
-                    trackChanges={trackChanges}
                 />
-            </div>
-            <TrackNodeMenu
-                trackNodes={trackNodes}
-                setTrackNodes={setTrackNodes}
-                graphData={graphData}
-                graphTimeline={graphTimeline}
-                currentInstance={currentInstance}
-            />
+            </ErrorBoundary>
         </div>}
         /> 
         <Route path="/node" element={<NewPage/>}/>
