@@ -17,6 +17,8 @@ import NewPage from "./node.js";
 import IRFileUpload from "./components/IRFileUpload";
 import NotificationToast from "./components/NotificationToast";
 import Footer from "./components/Footer";
+import Instructions from "./components/Instructions";
+import ErrorBoundary from "./components/graph/ErrorBoundary";
 
 import getData, { setNotificationCallback } from "./getData";
 import compareChanges from "./getChanges.js";
@@ -112,7 +114,7 @@ function App(data: any) {
         } catch (error: any) {
             setNotification({
                 type: 'error',
-                message: `Failed to parse JSON: ${error.message}`,
+                message: `Failed to process JSON: ${error.message}`,
                 duration: 5000
             });
             return;
@@ -231,6 +233,8 @@ function App(data: any) {
             ></FilterBox>
 
             <IRFileUpload onFileSelect={onFileUpload} />
+
+            <Instructions />
             
             {/* Graph Menu on upper right with buttons */}
             <GraphMenu
@@ -257,31 +261,34 @@ function App(data: any) {
                 setIsExpandedAll={setIsExpandedAll} 
             />
             {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
-            <GraphWrapper
-                height={ref?.current?.clientHeight ?? 735}
-                width={ref?.current?.clientWidth ?? 1710}
-                search={search}
-                threshold={value}
-                graphRef={graphRef}
-                graphData={graphData}
-                setInitCoords={setInitCoords}
-                setInitRotation={setInitRotation}
-                is3d={is3d}
-                antiPattern={antiPattern}
-                colorMode={color}
-                defNodeColor={defNodeColor}
-                setDefNodeColor={setDefNodeColor}
-                setGraphData={setGraphData}
-                isDarkMode={isDark}
-                selectedAntiPattern={selectedAntiPattern}
-                trackNodes={trackNodes}
-                focusNode={focusNode}
-                endpointCalls={[]}
-                trackChanges={trackChanges}
-                expandedNodes={expandedNodes}
-                setExpandedNodes={setExpandedNodes}
-                
-            />
+            <ErrorBoundary setNotification={setNotification}>
+                <GraphWrapper
+                    height={ref?.current?.clientHeight ?? 735}
+                    width={ref?.current?.clientWidth ?? 1710}
+                    search={search}
+                    threshold={value}
+                    graphRef={graphRef}
+                    graphData={graphData}
+                    setInitCoords={setInitCoords}
+                    setInitRotation={setInitRotation}
+                    is3d={is3d}
+                    antiPattern={antiPattern}
+                    colorMode={color}
+                    defNodeColor={defNodeColor}
+                    setDefNodeColor={setDefNodeColor}
+                    setGraphData={setGraphData}
+                    isDarkMode={isDark}
+                    selectedAntiPattern={selectedAntiPattern}
+                    trackNodes={trackNodes}
+                    focusNode={focusNode}
+                    endpointCalls={[]}
+                    trackChanges={trackChanges}
+                    expandedNodes={expandedNodes}
+                    setExpandedNodes={setExpandedNodes}
+                    
+                />
+            </ErrorBoundary>
+
             <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
 
             {/* left click node pop up box */}

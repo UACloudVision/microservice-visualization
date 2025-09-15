@@ -69,7 +69,6 @@ const Graph: React.FC<Props> = ({
     const [selectedLink, setSelectedLink] = useState(null);
     
     const [hideNodes, setHideNodes] = useState<any>(new Set());
-    // const [expandedNodes, setExpandedNodes] = useState(new Set<string>());
     const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // On page load
@@ -84,7 +83,7 @@ const Graph: React.FC<Props> = ({
         }
     }, []);
 
-    // --- NEW: Double-click handler to expand/collapse nodes ---
+    // Double-click handler to expand/collapse nodes.
     const handleNodeDoubleClick = useCallback((node: any) => {
         // Only allow expanding/collapsing microservice nodes
         if (node.nodeType !== 'microservice') return;
@@ -98,7 +97,7 @@ const Graph: React.FC<Props> = ({
         setExpandedNodes(newExpandedNodes);
     }, [expandedNodes]);
 
-    // --- NEW: Memoized function to filter data based on expanded nodes ---
+    // Memoized function to filter data based on expanded nodes.
     const visibleData = useMemo(() => {
         if (!sharedProps.graphData) {
             return { nodes: [], links: [] };
@@ -261,7 +260,7 @@ const Graph: React.FC<Props> = ({
                 }
             }}
 
-            // --- RESTORED: Your Detailed Link Styling Props ---
+            // Detailed Link Styling Props.
             linkCurvature={(link) => (link.hasReciprocal ? 0.4 : 0)}
             linkWidth={(link) =>
                 getLinkWidth(
@@ -269,10 +268,12 @@ const Graph: React.FC<Props> = ({
                 )
             }
             linkColor={(link) =>
-                getLinkColor(
-                    link, search, hoverNode, antiPattern, true,
-                    selectedAntiPattern, focusNode, trackChanges
-                )
+                link.nodeType === 'hierarchy'
+                    ? 'rgba(246, 225, 36, 0.65)' 
+                    : getLinkColor(
+                        link, search, hoverNode, antiPattern, true,
+                        selectedAntiPattern, focusNode, trackChanges
+                    )
             }
             linkDirectionalArrowLength={(link) => link.nodeType === 'hierarchy' ? 0 : 10}
             linkDirectionalArrowRelPos={sharedProps.linkDirectionalArrowRelPos}
