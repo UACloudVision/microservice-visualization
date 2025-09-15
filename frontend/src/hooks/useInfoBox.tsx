@@ -22,7 +22,6 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
 
             setAnchorPoint({ x: event.pageX, y: event.pageY });
             setName(node.name);
-            setType("link");
             setFocusNode({
                 node: event.detail.link.source.nodeName,
                 neighbors: [node.target]
@@ -32,15 +31,16 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
             setDepends([]);
             //setAntiPatterns(event.detail.node.patterns)
             setShow(true);
-            if (node.source.nodeType == "microservice"){
-                setSource(node.source.nodeName);
-                setDestination(node.target.nodeName);
+            setSource(node.source.displayName);
+            setDestination(node.target.displayName);
 
+            if (node.source.nodeType == "microservice"){    
+                if(node.target.nodeType == "controller") {
+                    setType("sublink");
+                } else setType("link");
             }
-            else{
-                setSource(node.source.microserviceName);
-                setDestination(node.target.microserviceName);
-
+            else if (node.source.nodeType == "controller") {
+                setType("sublink");
             }
         }, [setShow, setAnchorPoint, setName, setType, 
             setFocusNode, setDependencies, setDepends, setSource, setDestination]

@@ -28,7 +28,7 @@ export const InfoBox = (props: Props) => {
     };
     
     // Popup for a link
-    if (type == "link"){
+    if (type == "link" || type == "sublink"){
         return (
         <ul
             className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
@@ -44,82 +44,94 @@ export const InfoBox = (props: Props) => {
                     </svg>
                     Link Details
                 </h4>
-                {/* <p className="font-semibold">Link: {name}</p> */}
-                <p><strong>Source:</strong> {source}</p>
-                <p><strong>Destination:</strong> {destination}</p>
-            </div>
-
-            <div className="w-full h-px bg-slate-300 my-2"></div>
-
-            <div className="max-h-96 w-96 overflow-y-scroll dark-scrollbar">
-                <div className="font-medium mb-2">Method Calls</div>
-                {dependencies && dependencies.length > 0 ? (
-                    dependencies.map((link: any, index: number) => (
-                        <CollapsableBox
-                            key={index}
-                            title="Method Calls"
-                            svg={arrowSvg}
-                            body={
-                                link.requests &&
-                                link.requests.length > 0 ? (
-                                    link.requests.map((func: any, subIndex: number) => (
-                                        <ul
-                                            key={subIndex}
-                                            className={`
-                                                mb-4 p-4 rounded-xl border border-slate-300 shadow-sm
-                                                bg-white/90 backdrop-blur-sm
-                                                ${getColorClass(func.color)}
-                                            `}
-                                        >
-                                            {/* Header Section with Source and Destination */}
-                                            <div className="flex flex-col gap-1 mb-2">
-                                                <h5 className="font-semibold text-base flex items-center gap-2">
-                                                    Source: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
-                                                </h5>
-                                                <h5 className="font-semibold text-base flex items-center gap-2">
-                                                    Destination: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
-                                                </h5>
-                                            </div>
-                                            
-                                            <div className="w-full h-px bg-slate-300 my-3"></div>
-                                            
-                                            {/* Details Grid */}
-                                            <div className="flex flex-col gap-3">
-                                                {func.type && (
-                                                    <>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-medium text-xs text-slate-500">HTTP Method</span>
-                                                            <span className="font-semibold text-sm text-slate-700">{func.type}</span>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-medium text-xs text-slate-500">URL</span>
-                                                            <span className="font-normal text-sm break-words">{func.destinationUrl}</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-xs text-slate-500">Return Type</span>
-                                                    <span className="font-mono text-cyan-600 text-sm break-words">{func.msReturn ? func.msReturn : 'None'}</span>
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-xs text-slate-500">Arguments</span>
-                                                    <span className="text-sm break-words">{func.argument}</span>
-                                                </div>
-                                            </div>
-                                        </ul>
-                                    ))
-                                ) : (
-                                    <div>None</div>
-                                )
-                            }
-                            initOpen={false}
-                        />
-                    ))
-                ) : (
-                    <div>None</div>
+                {type == 'link' ? (
+                    <div>
+                        <p><strong>Source:</strong> {source}</p>
+                        <p><strong>Destination:</strong> {destination}</p>
+                    </div>
+                ): (
+                    <div>
+                        <p><strong>Parent:</strong> {source}</p>
+                        <p><strong>Child:</strong> {destination}</p>
+                    </div>
                 )}
             </div>
-
+            
+            {type == 'link' && (
+                <div className="w-full h-px bg-slate-300 my-2"></div>
+            )}
+            
+            {type == 'link' && (
+                <div className="max-h-96 w-96 overflow-y-scroll dark-scrollbar">
+                    <div className="font-medium mb-2">Method Calls</div>
+                    {dependencies && dependencies.length > 0 ? (
+                        dependencies.map((link: any, index: number) => (
+                            <CollapsableBox
+                                key={index}
+                                title="Method Calls"
+                                svg={arrowSvg}
+                                body={
+                                    link.requests &&
+                                    link.requests.length > 0 ? (
+                                        link.requests.map((func: any, subIndex: number) => (
+                                            <ul
+                                                key={subIndex}
+                                                className={`
+                                                    mb-4 p-4 rounded-xl border border-slate-300 shadow-sm
+                                                    bg-white/90 backdrop-blur-sm
+                                                    ${getColorClass(func.color)}
+                                                `}
+                                            >
+                                                {/* Header Section with Source and Destination */}
+                                                <div className="flex flex-col gap-1 mb-2">
+                                                    <h5 className="font-semibold text-base flex items-center gap-2">
+                                                        Source: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
+                                                    </h5>
+                                                    <h5 className="font-semibold text-base flex items-center gap-2">
+                                                        Destination: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
+                                                    </h5>
+                                                </div>
+                                                
+                                                <div className="w-full h-px bg-slate-300 my-3"></div>
+                                                
+                                                {/* Details Grid */}
+                                                <div className="flex flex-col gap-3">
+                                                    {func.type && (
+                                                        <>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium text-xs text-slate-500">HTTP Method</span>
+                                                                <span className="font-semibold text-sm text-slate-700">{func.type}</span>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium text-xs text-slate-500">URL</span>
+                                                                <span className="font-normal text-sm break-words">{func.destinationUrl}</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-xs text-slate-500">Return Type</span>
+                                                        <span className="font-mono text-cyan-600 text-sm break-words">{func.msReturn ? func.msReturn : 'None'}</span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-xs text-slate-500">Arguments</span>
+                                                        <span className="text-sm break-words">{func.argument}</span>
+                                                    </div>
+                                                </div>
+                                            </ul>
+                                        ))
+                                    ) : (
+                                        <div>None</div>
+                                    )
+                                }
+                                initOpen={false}
+                            />
+                        ))
+                    ) : (
+                        <div>None</div>
+                    )}
+                </div>
+            )} 
+            
             <div className="w-full h-px bg-slate-300 my-2"></div>
             
             <button
