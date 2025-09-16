@@ -8,7 +8,7 @@ import {
     getNodeOpacity,
     getVisibility,
     showNeighbors,
-} from "../../utils/GraphFunctions";
+} from "../../utils/graphFunctions";
 
 type Props = {
     width: number;

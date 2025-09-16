@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import compareChanges from "../../getChanges";
-import getData from "../../getData";
+import compareChanges from "../../parsers/getChanges";
+import getData from "../../parsers/getData";
 
 //*
 // The time slide is what controller which commit is shown on the visualization
@@ -36,7 +36,7 @@ const TimeSlider: React.FC<Props> = ({
     const [value, setValue] = useState(0);
     
     // UI state for the expand/collapse feature.
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Original handleChange function is unchanged.
     const handleChange = (e: any) => {
@@ -62,7 +62,7 @@ const TimeSlider: React.FC<Props> = ({
                 {/* Header with title and collapse/expand button */}
                 <div className="relative mb-3">
                     <label htmlFor="steps-range" className="font-semibold text-xl animated-gradient-dark block text-center w-full">
-                        Changes Timeline
+                        Commit Timeline
                     </label>
                     <button 
                         onClick={() => setIsExpanded(!isExpanded)} 
@@ -71,7 +71,7 @@ const TimeSlider: React.FC<Props> = ({
                     >
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
-                        className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'}`} 
+                        className={`h-5 w-5 transition-transform duration-300 ${isExpanded ? '' : 'rotate-180 animate-bounce-subtle'}`} 
                         viewBox="0 0 20 20" 
                         fill="currentColor"
                     >

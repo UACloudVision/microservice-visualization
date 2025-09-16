@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import { getNeighbors } from "../utils/GraphFunctions";
+import { getNeighbors } from "../utils/graphFunctions";
 
 export const useInfoBox = (graphData: any, setFocusNode: any) => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });

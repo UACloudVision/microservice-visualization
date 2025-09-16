@@ -1,11 +1,11 @@
 "use client"
 import * as THREE from "three";
 import { useLocation } from 'react-router-dom';
-import Menu from "./components/graph/RightClickNodeMenu";
-import { InfoBox } from "./components/graph/NodeInfoBox";
+import Menu from "../components/graph/RightClickNodeMenu";
+import { InfoBox } from "../components/graph/NodeInfoBox";
 import React, { useEffect, useRef, useState } from "react";
-import GraphWrapper from "./components/graph/GraphWrapper";
-import { setupAxios, setupLogger } from "./utils/axiosSetup";
+import GraphWrapper from "../components/graph/GraphWrapper";
+import { setupAxios, setupLogger } from "./axiosSetup";
 
 import ForceGraph3D from "react-force-graph-3d";
 

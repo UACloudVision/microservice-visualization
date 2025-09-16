@@ -1,5 +1,5 @@
 import { useContextMenu } from "../../hooks/useContextMenu";
-import { showNeighbors } from "../../utils/GraphFunctions";
+import { showNeighbors } from "../../utils/graphFunctions";
 import React from "react";
 
 type Props = {

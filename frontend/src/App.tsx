@@ -8,20 +8,20 @@ import TimeSlider from "./components/graph/TimeSlider";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import axios from "axios";
-import TrackNodeMenu from "./components/TrackNodeMenu";
-import FilterBox from "./page.js";
+import TrackNodeMenu from "./components/generic/TrackNodeMenu";
+import FilterBox from "./utils/page.js";
 import { BrowserRouter, Router } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
-import NewPage from "./node.js";
+import NewPage from "./utils/node.js";
 import IRFileUpload from "./components/IRFileUpload";
-import NotificationToast from "./components/NotificationToast";
-import Footer from "./components/Footer";
-import Instructions from "./components/Instructions";
+import NotificationToast from "./components/generic/NotificationToast";
+import Footer from "./components/generic/Footer";
+import Instructions from "./components/generic/Instructions";
 import ErrorBoundary from "./components/graph/ErrorBoundary";
 
-import getData, { setNotificationCallback } from "./getData";
-import compareChanges from "./getChanges.js";
+import getData, { setNotificationCallback } from "./parsers/getData";
+import compareChanges from "./parsers/getChanges.js";
 
 interface Notification {
     type: 'error' | 'warning' | 'success' | 'info';

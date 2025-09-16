@@ -8,7 +8,7 @@ import {
     getNeighbors,
     getNodeOpacity,
     getVisibility,
-} from "../../utils/GraphFunctions";
+} from "../../utils/graphFunctions";
 import * as THREE from "three";
 import SpriteText from "three-spritetext";
 

@@ -1,6 +1,6 @@
 import { saveAs } from "file-saver";
 import React, { useState } from "react";
-import { reset } from "../../utils/GraphFunctions";
+import { reset } from "../../utils/graphFunctions";
 import axios from "axios";
 
 type ButtonProps = {

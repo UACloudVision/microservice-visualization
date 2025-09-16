@@ -1,6 +1,6 @@
 import React, { SetStateAction, useEffect, useState } from "react";
 import { useInfoBox } from "../../hooks/useInfoBox";
-import CollapsableBox from "../CollapsableBox";
+import CollapsableBox from "../generic/CollapsableBox";
 
 type Props = {
     graphData: any;

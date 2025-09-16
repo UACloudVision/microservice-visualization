@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import GraphButtonMenu from "./GraphButtons";
 import Search from "./Search";
-import getData from "../../getData";
-import compareChanges from "../../getChanges";
+import getData from "../../parsers/getData";
+import compareChanges from "../../parsers/getChanges";
 
 type Props = {
     graphRef: any;

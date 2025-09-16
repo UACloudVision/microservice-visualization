@@ -1,5 +1,5 @@
 import { ColorRepresentation } from "three";
-import { Antipattern, Node } from "../types";
+import { Antipattern} from "./types";
 
 const RED = "rgb(255,0,0)";
 const ORANGE = "rgb(255,160,0)";
