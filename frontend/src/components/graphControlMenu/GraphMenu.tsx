@@ -24,9 +24,10 @@ type Props = {
     selectedAntiPattern: string;
     currentInstance: any;
     graphTimeline: any;
-
     isExpandedAll: boolean;
     setIsExpandedAll: React.Dispatch<React.SetStateAction<boolean>>;
+    isHighLevelExpanded: boolean;
+    setIsHighLevelExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /**
@@ -56,9 +57,10 @@ const GraphMenu: React.FC<Props> = ({
     selectedAntiPattern,
     currentInstance,
     graphTimeline,
-
     isExpandedAll,
     setIsExpandedAll,
+    isHighLevelExpanded,
+    setIsHighLevelExpanded,
 }) => {
     return (
         <div className="absolute top-4 left-4 z-50 flex flex-col gap-4 bg-slate-800/70 text-white rounded-xl p-4 shadow-lg backdrop-blur-none transition-all duration-300 w-1/6">
@@ -187,6 +189,65 @@ const GraphMenu: React.FC<Props> = ({
                     />
                     <div className="w-11 h-6 bg-red-500 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-400 transition-colors duration-300
                                     peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
+                                    after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
+                                    peer-checked:after:translate-x-full after:duration-300">
+                    </div>
+                </label>
+            </div>
+
+            {/* Horizontal divider */}
+            <div className="w-full h-px bg-slate-700"></div>
+
+            {/* High-Level View Switch */}
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                    {isHighLevelExpanded ? (
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-teal-400"
+                            >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3 4.5h18M6.75 9.75h10.5M10.5 15h3"
+                            />
+                        </svg>
+                    ) : (
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-teal-400"
+                            >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3 4.5h18M6.75 9.75h10.5M10.5 15h3"
+                            />
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15 9l6 6m0-6l-6 6"
+                            />
+                        </svg>
+                    )}
+                    <strong>Entity View:</strong> {isHighLevelExpanded ? 'On' : 'Off'}
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={isHighLevelExpanded}
+                        className="sr-only peer"
+                        onChange={() => setIsHighLevelExpanded(!isHighLevelExpanded)}
+                    />
+                    <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-teal-400 transition-colors duration-300
+                                    peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white
                                     after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
                                     peer-checked:after:translate-x-full after:duration-300">
                     </div>

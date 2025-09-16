@@ -13,6 +13,7 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
     const [parameters, setParameters] = useState<any[]>();
     const [source, setSource] = useState<String>();
     const [destination, setDestination] = useState<String>();
+    const [entityDependencies, setEntityDependencies] = useState<Map<string, any[]>>(new Map());
 
     let node;
 
@@ -60,9 +61,7 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
         // Handling different node types.
         switch (node.nodeType) {
             case 'microservice':
-            case 'entity':
                 // No specific details like methods or parent source to set
-                // for both microservices and entities.
                 break;
 
             case 'service': {
@@ -94,6 +93,28 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
                 setSource(node.parentMicroservice);
                 setParameters(node.parameters);
                 break;
+
+            case 'entity': {
+                const dependentsMap = new Map<string, any[]>();
+                
+                const dependentLinks = graphData.links.filter(
+                    (link: any) => link.nodeType === 'uses' && 
+                    (link.target.nodeName || link.target) === node.nodeName
+                );
+
+                // Group the source of those links (the components) by their parent microservice
+                for (const link of dependentLinks) {
+                    const component = link.source;
+                    if (component && component.parentMicroservice) {
+                        if (!dependentsMap.has(component.parentMicroservice)) {
+                            dependentsMap.set(component.parentMicroservice, []);
+                        }
+                        dependentsMap.get(component.parentMicroservice)!.push(component);
+                    }
+                }
+                setEntityDependencies(dependentsMap);
+                break;
+            }
         }
 
         // Common logic for all node types.
@@ -159,6 +180,7 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
         methods,
         source, 
         destination,
-        parameters
+        parameters,
+        entityDependencies
     };
 };

@@ -11,7 +11,9 @@ type Props = {
 
 //Info box shown when you click on a link or a node
 export const InfoBox = (props: Props) => {
-    const { anchorPoint, show, name, type, depends, setShow, dependencies, patterns, methods, source, destination, parameters} =
+    const { anchorPoint, show, name, type, depends, 
+        setShow, dependencies, patterns, methods, 
+        source, destination, parameters, entityDependencies} =
         useInfoBox(props.graphData, props.setFocusNode);
 
     const getColorClass = (color: string) => {
@@ -172,20 +174,73 @@ export const InfoBox = (props: Props) => {
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M4.5 6.75V19.5A2.25 2.25 0 006.75 21h10.5a2.25 2.25 0 002.25-2.25V6.75m-13.5 0A2.25 2.25 0 016.75 4.5h10.5a2.25 2.25 0 012.25 2.25m-13.5 0v-.375c0-.621.504-1.125 1.125-1.125h11.25c.621 0 1.125.504 1.125 1.125v.375m-4.875 4.125h-4.5"
+                                d="M12 3c-4.97 0-9 1.343-9 3s4.03 3 9 3 9-1.343 9-3-4.03-3-9-3zm9 3v12c0 1.657-4.03 3-9 3s-9-1.343-9-3V6m18 6c0 1.657-4.03 3-9 3s-9-1.343-9-3"
                             />
                         </svg>
                         Entity Details
                     </h4>
                     <div className="flex flex-col gap-1">
-                        <p><strong>Entity:</strong> {name}</p>
-                        <p><strong>Type:</strong> {type}</p>
+                        <p><strong>Name:</strong> {name}</p>
                     </div>
                 </div>
+
                 <div className="w-full h-px bg-slate-300 my-2"></div>
-                {/* Need to list which components depend on this entity */}
-                <button onClick={() => setShow(false)} className="...">
-                    Close
+                <div className="overflow-y-auto dark-scrollbar">
+                    <h5 className="font-semibold text-sm mb-2">Used By (Microservices):</h5>
+                    {entityDependencies && entityDependencies.size > 0 ? (
+                        Array.from(entityDependencies.entries()).map(([microserviceName, components]) => (
+                            <CollapsableBox
+                                key={microserviceName}
+                                title={microserviceName}
+                                svg={arrowSvg} 
+                                body={
+                                    <ul className="pl-2 pt-2 flex flex-col gap-2">
+                                        {components.map(comp => (
+                                            <li
+                                                key={comp.nodeName}
+                                                className="text-sm p-2 bg-slate-100 rounded-md flex items-center gap-3
+                                                        hover:bg-slate-200 transition-colors duration-200 cursor-default"
+                                            >
+                                                {/* Badge for Component Type */}
+                                                <span
+                                                    className={`
+                                                        w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-full font-bold text-xs
+                                                        ${comp.nodeType === 'controller'
+                                                            ? 'bg-sky-100 text-sky-700'
+                                                            : 'bg-teal-100 text-teal-700'
+                                                        }
+                                                    `}
+                                                >
+                                                    {comp.nodeType.charAt(0).toUpperCase()}
+                                                </span>
+                                                {/* Component Name */}
+                                                <span className="font-medium text-slate-700">
+                                                    {comp.displayName}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                }
+                                initOpen={false} 
+                            />
+                        ))
+                    ) : (
+                        <div className="text-sm text-slate-500">Not used by any components in the current view.</div>
+                    )}
+                </div>
+
+                <div className="w-full h-px bg-slate-300 my-2"></div>
+                <button
+                    onClick={() => {
+                        props.setFocusNode(null);
+                        setShow(false);
+                    }}
+                    className="
+                        mt-2 w-full rounded-xl px-4 py-2 text-center text-sm font-semibold transition-all duration-200
+                        bg-slate-300 hover:bg-slate-400 text-slate-800
+                    "
+                >
+                    Close Box
                 </button>
             </ul>
         );

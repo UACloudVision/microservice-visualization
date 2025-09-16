@@ -33,6 +33,7 @@ type Props = {
     endpointCalls: any;
     trackChanges: any;
     expandedNodes: Set<string>;
+    isHighLevelExpanded: boolean;
     setExpandedNodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
@@ -57,6 +58,7 @@ const Graph: React.FC<Props> = ({
     trackChanges,
     expandedNodes,
     setExpandedNodes,
+    isHighLevelExpanded
 }) => {
     const [highlightNodes, setHighlightNodes] = useState<Set<string>>(
         new Set()
@@ -104,22 +106,23 @@ const Graph: React.FC<Props> = ({
             return { nodes: [], links: [] };
         }
 
-        const visibleComponentIds = new Set(
-            allNodes
-                .filter((node: any) => expandedNodes.has(node.parentMicroservice))
-                .map((node: any) => node.nodeName)
-        );
+        let visibleNodes;
 
-        const relevantUsesLinks = allLinks.filter((link: any) =>
-            link.nodeType === 'uses' && visibleComponentIds.has(link.source.nodeName || link.source)
-        );
+        if (isHighLevelExpanded) {
+            visibleNodes = allNodes.filter((node: any) => node.nodeType !== 'method');
+        } else {
+            const relevantUsesLinks = allLinks.filter((link: any) =>
+                link.nodeType === 'uses' && 
+                allNodes.find((n: any) => (n.nodeName === (link.source.nodeName || link.source)) && expandedNodes.has(n.parentMicroservice))
+            );
+            const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
 
-        const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
-        const visibleNodes = allNodes.filter((node: any) =>
-            node.nodeType === 'microservice' ||
-            expandedNodes.has(node.parentMicroservice) ||
-            (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
-        );
+            visibleNodes = allNodes.filter((node: any) =>
+                node.nodeType === 'microservice' ||
+                expandedNodes.has(node.parentMicroservice) ||
+                (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
+            );
+        }
 
         const visibleNodeIds = new Set(visibleNodes.map((n: any) => n.nodeName));
         const visibleLinks = allLinks.filter((link: any) =>

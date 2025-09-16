@@ -26,6 +26,7 @@ type Props = {
     trackChanges: any;
     
     expandedNodes: Set<string>;
+    isHighLevelExpanded: boolean;
     setExpandedNodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
@@ -52,6 +53,7 @@ const VisualizationOptions: React.FC<Props> = ({
     trackChanges,
     expandedNodes,
     setExpandedNodes,
+    isHighLevelExpanded
 }) => {
     const Shared2D3DProps: SharedProps = {
         linkDirectionalArrowRelPos: 1,
@@ -65,20 +67,6 @@ const VisualizationOptions: React.FC<Props> = ({
 
     return (
         <div>
-            {/* {!is3d ? (
-                <Graph2D
-                    width={width}
-                    height={height}
-                    {...GraphProps}
-                    search={search}
-                    graphRef={graphRef}
-                    threshold={threshold}
-                    setInitCoords={setInitCoords}
-                    setInitRotation={setInitRotation}
-                    antiPattern={antiPattern}
-                    colorMode={colorMode}
-                />
-            ) : ( */}
             <Graph3D
                 width={width}
                 height={height}
@@ -101,6 +89,7 @@ const VisualizationOptions: React.FC<Props> = ({
                 trackChanges={trackChanges}
                 expandedNodes={expandedNodes}
                 setExpandedNodes={setExpandedNodes}
+                isHighLevelExpanded={isHighLevelExpanded}
             />
         </div>
     );

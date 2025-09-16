@@ -53,7 +53,8 @@ function App(data: any) {
 
     // Show all states
     const [expandedNodes, setExpandedNodes] = useState(new Set<string>());
-    const [isExpandedAll, setIsExpandedAll] = useState(false); 
+    const [isHighLevelExpanded, setIsHighLevelExpanded] = useState(false); 
+    const [isExpandedAll, setIsExpandedAll] = useState(false);
 
     // Notification state
     const [notification, setNotification] = useState<Notification | null>(null);
@@ -65,7 +66,23 @@ function App(data: any) {
         });
     }, []);
 
-    useEffect(() => { // <-- NEW
+    useEffect(() => {
+        if (!graphData || !graphData.nodes) return;
+
+        const allMicroserviceIds = graphData.nodes
+            .filter((node: any) => node.nodeType === 'microservice')
+            .map((node: any) => node.nodeName);
+
+        if (isExpandedAll || isHighLevelExpanded) {
+            // If EITHER toggle is on, expand all microservices
+            setExpandedNodes(new Set(allMicroserviceIds));
+        } else {
+            // If BOTH are off, clear all expansions
+            setExpandedNodes(new Set());
+        }
+    }, [isExpandedAll, isHighLevelExpanded, graphData]);
+
+    useEffect(() => { 
         if (!graphData || !graphData.nodes) return;
 
         if (isExpandedAll) {
@@ -80,6 +97,18 @@ function App(data: any) {
             setExpandedNodes(new Set());
         }
     }, [isExpandedAll, graphData?.nodes]);
+
+    useEffect(() => {
+        if (isExpandedAll) {
+            setIsHighLevelExpanded(false);
+        }
+    }, [isExpandedAll]);
+
+    useEffect(() => {
+        if (isHighLevelExpanded) {
+            setIsExpandedAll(false);
+        }
+    }, [isHighLevelExpanded]);
 
     const onFileUpload = async (file: File) => {
         try {
@@ -125,52 +154,6 @@ function App(data: any) {
     const handleNotificationClose = () => {
         setNotification(null);
     };
-
-    // For using backend
-    //useEffect(() => {
-        //const getGraphLifespan = async () => {
-            //const graphLifespan = await axios.get(`/graph/${graphName}`);
-            //console.log(graphLifespan);
-            //setGraphTimeline(graphLifespan.data);
-            //setGraphData(graphLifespan.data[0] ?? null);
-            //setCurrentInstance(0);
-       // };
-
-        //getGraphLifespan();
-    //}, [graphName]);
-
-    /*useEffect(() => {
-        // This function allows the user to input a file, which we call input.json (imported as the term files), containing a list of IR file names for the timeline to contain
-        // The function will then grab the contents of each of those files and push them to a temp array before adding them to the graphtimeline. It must be done this way
-        // The files called in input.json must be in frontend/public/data 
-        const fetchData = async () => {
-            try {
-                let temp: any = [];
-                for (const filePath of files["files"]) {
-                    const fileResponse = await fetch(filePath);
-                    const fileData = await fileResponse.json();
-                    // Call getData with the JSON content
-                    // check if a commit with that id already in it? Runs twice due to react strict mode
-                    if (!temp.some((commit: any) => commit.commitID === fileData.commitID)) {
-                        temp.push(fileData);
-                    }
-                }
-                return temp;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        const getGraphLifespan = async () => {
-            //Fethcing the contents of the IR files from the input.json file. In the future could be made more dynamic by having the user input a file. 
-            let commits = await fetchData();
-            setGraphTimeline(commits);     //HERE is how to manage the timeline
-            setGraphData(getData(commits[0], undefined));
-            setCurrentInstance(0);
-        };
-
-        getGraphLifespan();
-    }, [graphName]);*/
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         return (
@@ -260,6 +243,8 @@ function App(data: any) {
                     graphTimeline={graphTimeline}
                     isExpandedAll={isExpandedAll}
                     setIsExpandedAll={setIsExpandedAll} 
+                    isHighLevelExpanded={isHighLevelExpanded}
+                    setIsHighLevelExpanded={setIsHighLevelExpanded}
                 />
                 {/* Graph object itself, contained within a wrapper to toggle 2d-3d */}
             
@@ -286,7 +271,7 @@ function App(data: any) {
                     trackChanges={trackChanges}
                     expandedNodes={expandedNodes}
                     setExpandedNodes={setExpandedNodes}
-                    
+                    isHighLevelExpanded={isHighLevelExpanded}
                 />
             
                 <Menu trackNodes={trackNodes} setTrackNodes={setTrackNodes} />
