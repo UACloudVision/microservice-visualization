@@ -9,11 +9,12 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
     const [depends, setDepends] = useState<any[]>();
     const [dependencies, setDependencies] = useState<any[]>();
     const [patterns, setAntiPatterns] = useState<any[]>();
-    let node;
     const [methods, setMethods] = useState<any[]>();
     const [parameters, setParameters] = useState<any[]>();
     const [source, setSource] = useState<String>();
     const [destination, setDestination] = useState<String>();
+
+    let node;
 
     const handleLinkClick = useCallback(
         (event: any) => {
@@ -39,7 +40,7 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
                     setType("sublink");
                 } else setType("link");
             }
-            else if (node.source.nodeType == "controller") {
+            else {
                 setType("sublink");
             }
         }, [setShow, setAnchorPoint, setName, setType, 
@@ -59,7 +60,9 @@ export const useInfoBox = (graphData: any, setFocusNode: any) => {
         // Handling different node types.
         switch (node.nodeType) {
             case 'microservice':
+            case 'entity':
                 // No specific details like methods or parent source to set
+                // for both microservices and entities.
                 break;
 
             case 'service': {

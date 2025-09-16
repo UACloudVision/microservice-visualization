@@ -48,6 +48,7 @@ export interface Controller {
     methods: Method[];
     implementedTypes: string[];
     name: string;
+    imports: any[];
 }
 
 export interface Service extends Controller {}
@@ -93,11 +94,12 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             parentService: string | null; 
             parameters: any[] | null;
             returnType: string | null }> = [];
-        let methods: { [key: string]: any } = {};
-
-        let connections = new Map<string, number>();
+        
         let links: any[] = [];
-
+        let entitySet = new Set<string>();
+        let methods: { [key: string]: any } = {};
+        let connections = new Map<string, number>();
+        
         // Pre-filtering for performance optimization.
         let filteredMicroservices = nodes_array 
             ? microservices.filter(ms => {
@@ -236,13 +238,13 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                 nodes.filter(n => n.nodeType === 'method' && n.parentController === controller.nodeName)
                      .forEach(method => links.push({ source: controller.nodeName, target: method.nodeName, nodeType: "hierarchy" }));
 
-                // Creating Dependency Links (Controller -> Service)
+                // Creating Dependency Links (Controller -> Service).
                 msServices.forEach(service => {
                     links.push({
                         source: controller.nodeName,
                         target: service.nodeName,
                         name: `${controller.displayName} -> ${service.displayName}`,
-                        nodeType: "dependency" // New type for styling internal calls
+                        nodeType: "dependency"
                     });
                 });
             });
@@ -253,6 +255,45 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                 nodes.filter(n => n.nodeType === 'method' && n.parentService === service.nodeName)
                      .forEach(method => links.push({ source: service.nodeName, target: method.nodeName, nodeType: "hierarchy" }));
             });
+
+            // Creating Entity nodes and "uses" links (Service/Controller -> Entity).
+            const processImports = (component: Controller | Service) => {
+                const componentName = `${msName}.${component.name}`;
+                if (!component.imports) return;
+
+                for (const imp of component.imports) {
+                    // Assuming an import is an entity if it's in a package containing ".entity"
+                    if (imp.name && imp.name.includes(".entity.")) {
+                        const entityName = imp.importObject;
+                        
+                        // Add entity node only if it's new
+                        if (!entitySet.has(entityName)) {
+                            entitySet.add(entityName);
+                            nodes.push({
+                                "nodeName": entityName, 
+                                "displayName": entityName, 
+                                "nodeType": "entity",
+                                "parentMicroservice": null, 
+                                "parentController": null, 
+                                "parentService": null,
+                                "parameters": null, 
+                                "returnType": null
+                            });
+                        }
+
+                        // Create the "uses" link from component to entity
+                        links.push({
+                            source: componentName,
+                            target: entityName,
+                            name: `${componentName} -> ${entityName}`,
+                            nodeType: "uses" 
+                        });
+                    }
+                }
+            };
+
+            microservice.controllers.forEach(processImports);
+            microservice.services.forEach(processImports);
 
             // Create Communication Links (Method -> Method in another Microservice)
             const processMethodCalls = (componentArray: (Controller | Service)[]) => {

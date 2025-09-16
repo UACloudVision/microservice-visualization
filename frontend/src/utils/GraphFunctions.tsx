@@ -4,6 +4,7 @@ import { Antipattern, Node } from "../types";
 const RED = "rgb(255,0,0)";
 const ORANGE = "rgb(255,160,0)";
 const GREEN = "rgb(0,255,0)";
+const NEWGREEN = "rgba(0, 255, 204, 0.79)";
 const HOVER_BLUE = "rgb(89, 130, 255)";
 const HOVER_NEIGHBOR = "rgb(79, 200, 209)";
 const LIGHT_GRAY = "rgb(150,150,150)";
@@ -18,7 +19,8 @@ const NODE_COLORS = {
     "microservice": LIGHT_GRAY,
     "controller": LINK_TO_HOVER,
     "service": ORANGE,
-    "method": HOVER_BLUE
+    "method": HOVER_BLUE,
+    "entity": NEWGREEN
 }
 
 function getShape(type: String): number {

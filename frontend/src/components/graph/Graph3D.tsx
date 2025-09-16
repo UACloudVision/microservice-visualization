@@ -99,20 +99,29 @@ const Graph: React.FC<Props> = ({
 
     // Memoized function to filter data based on expanded nodes.
     const visibleData = useMemo(() => {
-        if (!sharedProps.graphData) {
+        const { nodes: allNodes, links: allLinks } = sharedProps.graphData || { nodes: [], links: [] };
+        if (!allNodes || allNodes.length === 0) {
             return { nodes: [], links: [] };
         }
-        const { nodes: allNodes, links: allLinks } = sharedProps.graphData;
 
-        if (!allNodes) return { nodes: [], links: [] };
+        const visibleComponentIds = new Set(
+            allNodes
+                .filter((node: any) => expandedNodes.has(node.parentMicroservice))
+                .map((node: any) => node.nodeName)
+        );
 
-        const visibleNodes = allNodes.filter((node: any) => 
-            node.nodeType === 'microservice' || 
-            expandedNodes.has(node.parentMicroservice)
+        const relevantUsesLinks = allLinks.filter((link: any) =>
+            link.nodeType === 'uses' && visibleComponentIds.has(link.source.nodeName || link.source)
+        );
+
+        const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
+        const visibleNodes = allNodes.filter((node: any) =>
+            node.nodeType === 'microservice' ||
+            expandedNodes.has(node.parentMicroservice) ||
+            (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
         );
 
         const visibleNodeIds = new Set(visibleNodes.map((n: any) => n.nodeName));
-
         const visibleLinks = allLinks.filter((link: any) =>
             visibleNodeIds.has(link.source?.nodeName || link.source) &&
             visibleNodeIds.has(link.target?.nodeName || link.target)
@@ -123,7 +132,6 @@ const Graph: React.FC<Props> = ({
     }, [sharedProps.graphData, expandedNodes]);
 
     const handleNodeHover = (node: any) => {
-        // ... (existing implementation is fine)
         const newHighlightNodes = new Set<string>();
         const newHighlightLinks = new Set<string>();
     
@@ -242,7 +250,9 @@ const Graph: React.FC<Props> = ({
                     geometry = new THREE.SphereGeometry(5);
                 } else if (nodeType === "METHOD") {
                     geometry = new THREE.SphereGeometry(4);
-                }
+                } else if (nodeType === "ENTITY") {
+                    geometry = new THREE.BoxGeometry(8, 8, 8); 
+                } 
 
                 const material = new THREE.MeshLambertMaterial({
                     transparent: true,
@@ -276,15 +286,19 @@ const Graph: React.FC<Props> = ({
                     link, search, highlightLinks, antiPattern, selectedAntiPattern
                 )
             }
-            linkColor={(link) =>
-                link.nodeType === 'hierarchy'
-                    ? 'rgba(246, 225, 36, 0.45)' 
-                    : getLinkColor(
-                        link, search, hoverNode, antiPattern, true,
-                        selectedAntiPattern, focusNode, trackChanges
-                    )
-            }
-            linkDirectionalArrowLength={(link) => link.nodeType === 'hierarchy' ? 0 : 10}
+            linkColor={(link) =>{
+                switch (link.nodeType) {
+                    case 'uses': return 'rgba(128, 0, 128, 0.7)'; // Controller/Service -> Entity
+                    case 'dependency': return 'rgba(255, 165, 0, 0.7)'; // Controller -> Service
+                    case 'hierarchy': return 'rgba(150, 150, 150, 0.5)'; // MS -> Controller/Service -> Method
+                    default:
+                        return getLinkColor(
+                            link, search, hoverNode, antiPattern, true,
+                            selectedAntiPattern, focusNode, trackChanges
+                        );
+                }
+            }}
+            linkDirectionalArrowLength={(link) => link.nodeType === 'link' ? 10 : 0}
             linkDirectionalArrowRelPos={sharedProps.linkDirectionalArrowRelPos}
             linkDirectionalArrowColor={(link) =>
                 getLinkColor(

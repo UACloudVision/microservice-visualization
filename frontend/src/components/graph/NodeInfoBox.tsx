@@ -150,15 +150,54 @@ export const InfoBox = (props: Props) => {
         );
         
     }
-    // check if type is not a microservice, which means it is a CONTROLLER, SERVICE, REPOSITORY, 
-    // or ENTITY
+    else if (type === "entity") {
+        return (
+            <ul
+                className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
+                    bg-white/90 text-slate-800 rounded-xl shadow-lg backdrop-blur-sm 
+                    transition-colors duration-300
+                    ${show ? `flex` : `hidden`}`}
+                style={{ top: anchorPoint.y, left: anchorPoint.x }}
+            >
+                <div className="flex flex-col gap-2">
+                    <h4 className="text-lg font-semibold border-b border-slate-300 pb-2 flex items-center gap-2">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-gray-400"
+                            >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4.5 6.75V19.5A2.25 2.25 0 006.75 21h10.5a2.25 2.25 0 002.25-2.25V6.75m-13.5 0A2.25 2.25 0 016.75 4.5h10.5a2.25 2.25 0 012.25 2.25m-13.5 0v-.375c0-.621.504-1.125 1.125-1.125h11.25c.621 0 1.125.504 1.125 1.125v.375m-4.875 4.125h-4.5"
+                            />
+                        </svg>
+                        Entity Details
+                    </h4>
+                    <div className="flex flex-col gap-1">
+                        <p><strong>Entity:</strong> {name}</p>
+                        <p><strong>Type:</strong> {type}</p>
+                    </div>
+                </div>
+                <div className="w-full h-px bg-slate-300 my-2"></div>
+                {/* Need to list which components depend on this entity */}
+                <button onClick={() => setShow(false)} className="...">
+                    Close
+                </button>
+            </ul>
+        );
+    }
+    // Check if type is not a microservice, which means it is a either a CONTROLLER or a SERVICE.
     else if (type != "microservice"){
-        // methods is not undefined if type is not a microservice and not a link
+        // Methods is not undefined if type is not a microservice and not a link.
         return(
         <ul
             className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
-                bg-white/90 text-slate-800
-                rounded-xl shadow-lg backdrop-blur-sm transition-colors duration-300
+                bg-white/90 text-slate-800 rounded-xl shadow-lg backdrop-blur-sm 
+                transition-colors duration-300
                 ${show ? `flex` : `hidden`}`}
             style={{ top: anchorPoint.y, left: anchorPoint.x }}
         >
@@ -273,7 +312,7 @@ export const InfoBox = (props: Props) => {
 
     }
 
-    //Return popup link for a node
+    // Return Microservice link for a node.
     return (
         <ul
             className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
