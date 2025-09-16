@@ -300,48 +300,110 @@ export const InfoBox = (props: Props) => {
                 <div className="flex flex-col gap-4">
                     {dependencies && dependencies.length > 0 ? (
                         dependencies.map((link: any, index: number) => (
-                            <CollapsableBox
-                                key={index}
-                                title={link.target.nodeName}
-                                svg={arrowSvg}
-                                body={
-                                    link.requests && link.requests.length > 0 ? (
-                                        link.requests.map((func: any, subIndex: number) => (
-                                            <ul
-                                                key={subIndex}
-                                                className={`mb-4 p-4 rounded-xl border border-slate-300 shadow-sm bg-white/90 backdrop-blur-sm`}
-                                            >
-                                                <div className="flex flex-col gap-1 mb-2">
-                                                    <h5 className="font-semibold text-base flex items-center gap-2">
-                                                        Source Method: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
-                                                    </h5>
-                                                    <h5 className="font-semibold text-base flex items-center gap-2">
-                                                        Destination Method: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
-                                                    </h5>
-                                                </div>
-                                                <div className="w-full h-px bg-slate-300 my-3"></div>
-                                                <div className="flex flex-col gap-3">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs text-slate-500">HTTP Method</span>
-                                                        <span className="font-semibold text-sm text-slate-700">{func.type}</span>
+                            link.target.nodeType == "microservice" && (
+                                <CollapsableBox
+                                    key={index}
+                                    title={(link.target.displayName || link.target.nodeName)}
+                                    svg={arrowSvg}
+                                    body={
+                                        // Dependencies are when my (a microservice) method (Caller could be in Service)
+                                        // invokes an enpoint (Callee) in a differnt microservice.
+                                        link.requests && link.requests.length > 0 ? (
+                                            link.requests.map((func: any, subIndex: number) => (
+                                                <ul
+                                                    key={subIndex}
+                                                    className={`mb-4 p-4 rounded-xl border border-slate-300 shadow-sm bg-white/90 backdrop-blur-sm`}
+                                                >
+                                                    <div className="flex flex-col gap-1 mb-2">
+                                                        <h6 className="font-semibold text-xs text-gray-500 flex items-center gap-2">
+                                                            Caller
+                                                        </h6>
+                                                        <h5 className="font-semibold text-base flex items-center gap-2">
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={1.5}
+                                                                stroke="currentColor"
+                                                                className="w-4 h-4 text-gray-400"
+                                                                >
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6.75L21.75 12l-5.25 5.25M7.5 17.25L2.25 12l5.25-5.25" />
+                                                            </svg>
+                                                            Service: <span className="font-normal text-slate-600 break-words">{func.className}</span>
+                                                        </h5>
+                                                        
+                                                        <h6 className="font-semibold text-xs text-gray-500 flex items-center gap-2">
+                                                            Reciever/Callee
+                                                        </h6>
+                                                        <h5 className="font-semibold text-base flex items-center gap-2">
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={1.5}
+                                                                stroke="currentColor"
+                                                                className="w-4 h-4 text-gray-400"
+                                                                >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                                                                />
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                                                                />
+                                                            </svg>
+                                                            Entry Point: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
+                                                        </h5>
+                                                        <h5 className="font-semibold text-base flex items-center gap-2">
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={1.5}
+                                                                stroke="currentColor"
+                                                                className="w-4 h-4 text-gray-400"
+                                                                >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                                                                />
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                                                                />
+                                                            </svg>
+                                                            Method: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
+                                                        </h5>
                                                     </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs text-slate-500">Return Type</span>
-                                                        <span className="font-mono text-cyan-600 text-sm break-words">{func.msReturn ? func.msReturn : 'None'}</span>
+                                                    <div className="w-full h-px bg-slate-300 my-3"></div>
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-xs text-slate-500">HTTP Method</span>
+                                                            <span className="font-semibold text-sm text-slate-700">{func.type}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-xs text-slate-500">Return Type</span>
+                                                            <span className="font-mono text-cyan-600 text-sm break-words">{func.msReturn ? func.msReturn : 'None'}</span>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-xs text-slate-500">Arguments</span>
+                                                            <span className="text-sm break-words">{func.argument}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs text-slate-500">Arguments</span>
-                                                        <span className="text-sm break-words">{func.argument}</span>
-                                                    </div>
-                                                </div>
-                                            </ul>
-                                        ))
-                                    ) : (
-                                        <div>None</div>
-                                    )
-                                }
-                                initOpen={false}
-                            />
+                                                </ul>
+                                            ))
+                                        ) : (
+                                            <div>None</div>
+                                        )
+                                    }
+                                    initOpen={false}
+                                />
+                            )
                         ))
                     ) : (
                         <div>None</div>
@@ -364,6 +426,9 @@ export const InfoBox = (props: Props) => {
                                                 key={subIndex}
                                                 className={`mb-4 p-4 rounded-xl border border-slate-300 shadow-sm bg-white/90 backdrop-blur-sm`}
                                             >
+                                                <h6 className="font-semibold text-xs text-gray-500 flex items-center gap-2">
+                                                    Caller:
+                                                </h6>
                                                 <div className="flex flex-col gap-1 mb-2">
                                                     <h5 className="font-semibold text-base flex items-center gap-2">
                                                         <svg
@@ -376,7 +441,33 @@ export const InfoBox = (props: Props) => {
                                                             >
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6.75L21.75 12l-5.25 5.25M7.5 17.25L2.25 12l5.25-5.25" />
                                                         </svg>
-                                                        Source Method: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
+                                                        Service: <span className="font-normal text-slate-600 break-words">{func.className}</span>
+                                                    </h5>
+
+                                                    <h6 className="font-semibold text-xs text-gray-500 flex items-center gap-2">
+                                                        Callee/This Microservice:
+                                                    </h6>
+                                                    <h5 className="font-semibold text-base flex items-center gap-2">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={1.5}
+                                                            stroke="currentColor"
+                                                            className="w-4 h-4 text-gray-400"
+                                                            >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                                                            />
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                                                            />
+                                                        </svg>
+                                                        Entry Point: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
                                                     </h5>
                                                     <h5 className="font-semibold text-base flex items-center gap-2">
                                                         <svg
@@ -398,8 +489,9 @@ export const InfoBox = (props: Props) => {
                                                                 d="M12 15a3 3 0 100-6 3 3 0 000 6z"
                                                             />
                                                         </svg>
-                                                        Destination Method: <span className="font-normal text-slate-600 break-words">{func.endpointFunction}</span>
+                                                        Method: <span className="font-normal text-slate-600 break-words">{func.sourceMethod}</span>
                                                     </h5>
+                                                    
                                                 </div>
                                                 <div className="w-full h-px bg-slate-300 my-3"></div>
                                                 <div className="flex flex-col gap-3">

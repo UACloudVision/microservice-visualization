@@ -235,11 +235,12 @@ const Graph: React.FC<Props> = ({
                 );
                 
                 let geometry;
-                if (node["nodeType"]?.toUpperCase() === "MICROSERVICE") {
+                let nodeType = node["nodeType"]?.toUpperCase();
+                if (nodeType === "MICROSERVICE") {
                     geometry = new THREE.SphereGeometry(6);
-                } else if (node["nodeType"]?.toUpperCase() === "CONTROLLER") {
+                } else if (nodeType === "CONTROLLER" || nodeType === "SERVICE") {
                     geometry = new THREE.SphereGeometry(5);
-                } else if (node["nodeType"]?.toUpperCase() === "METHOD") {
+                } else if (nodeType === "METHOD") {
                     geometry = new THREE.SphereGeometry(4);
                 }
 
@@ -277,7 +278,7 @@ const Graph: React.FC<Props> = ({
             }
             linkColor={(link) =>
                 link.nodeType === 'hierarchy'
-                    ? 'rgba(246, 225, 36, 0.65)' 
+                    ? 'rgba(246, 225, 36, 0.45)' 
                     : getLinkColor(
                         link, search, hoverNode, antiPattern, true,
                         selectedAntiPattern, focusNode, trackChanges

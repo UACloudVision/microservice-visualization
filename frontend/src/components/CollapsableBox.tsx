@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 type Props = {
     initOpen?: boolean;
-    svg: any;
+    svg: any | null;
     title: any;
     body: any;
 };

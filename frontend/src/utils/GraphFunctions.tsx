@@ -17,6 +17,7 @@ const LINK_TO_HOVER = "rgba(179, 66, 245,1)";
 const NODE_COLORS = {
     "microservice": LIGHT_GRAY,
     "controller": LINK_TO_HOVER,
+    "service": ORANGE,
     "method": HOVER_BLUE
 }
 

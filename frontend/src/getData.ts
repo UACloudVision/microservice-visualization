@@ -50,15 +50,22 @@ export interface Controller {
     name: string;
 }
 
+export interface Service extends Controller {}
+
 export interface Microservice {
     name: string;
     controllers: Controller[];
-    services: Controller[]; // Services have the same structure as controllers
+    services: Service[]; // Services have the same structure as controllers
 }
 
 export interface IRData {
     microservices: Microservice[];
     commitID?: string;
+}
+
+function findMethodByUrl(callUrl: string, methodsDict: { [key: string]: any }): any | null {
+    if (!callUrl) return null;
+    return methodsDict[callUrl];
 }
 
 // Retrieving and parsing data from the IR json file.
@@ -82,8 +89,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             nodeType: string;
             displayName: string;
             parentMicroservice: string | null;
-            parentController: string | null 
-            parameters: any[] | null,
+            parentController: string | null;
+            parentService: string | null; 
+            parameters: any[] | null;
             returnType: string | null }> = [];
         let methods: { [key: string]: any } = {};
 
@@ -101,6 +109,7 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
             })
             : microservices;
         
+        // First pass - identifying nodes.
         for (let microservice of filteredMicroservices){
             let nodeName = microservice["name"];
 
@@ -111,6 +120,7 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     "nodeType": "microservice",
                     "parentMicroservice": null,
                     "parentController": null,
+                    "parentService": null,
                     "parameters": [],
                     "returnType": null
                 });
@@ -120,9 +130,8 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                 continue;
             }
             
-            let controllers = microservice["controllers"];
-            for (let j=0; j<controllers.length; j++){
-                let controller = controllers[j];
+            // Handling controllers.
+            for (let controller of microservice["controllers"]){
                 let controllerUniqueName = `${nodeName}.${controller["name"]}`;
                 nodes.push({
                     "nodeName": controllerUniqueName,
@@ -130,19 +139,12 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     "nodeType": "controller", // New node type
                     "parentMicroservice": nodeName, // Add parent for hierarchy
                     "parentController": null,
+                    "parentService": null,
                     "parameters": null,
                     "returnType": null
                 });
 
-                links.push({
-                    source: nodeName, // The parent microservice
-                    target: controllerUniqueName,
-                    name: `${nodeName}->${controllerUniqueName}`,
-                    nodeType: "hierarchy" // A new type for styling
-                });
-
                 let functions = controller["methods"];
-                
                 for (let k=0; k<functions.length; k++){
                     let method = functions[k];
                     let url = method["url"];
@@ -159,15 +161,9 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                         "displayName": methodName,
                         "parentController": controllerUniqueName,
                         "parentMicroservice": nodeName,
+                        "parentService": null,
                         "parameters": parameters,
                         "returnType": returnType
-                    });
-
-                    links.push({
-                        source: controllerUniqueName, // The parent controller
-                        target: fullMethodName,
-                        name: `${controllerUniqueName}->${fullMethodName}`,
-                        nodeType: "hierarchy" // A new type for styling
                     });
                     
                     //Check if this method has a default annotation, then also add that url
@@ -194,101 +190,112 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     }
                 }
             }
-        }
 
-        // The map can be controller or service
-        const iterateThrough = (array: Controller[], microserviceName: string): void => {
-            for (let i=0; i<array.length; i++){
-                let arr = array[i];
-                let funcs = arr["methods"];
-                
-                for (let i = 0; i < funcs.length; i++) {
-                    let func = funcs[i];
-                    let methodCalls = func["methodCalls"];
-                    
-                    for (let i=0; i<methodCalls.length; i++){
-                        let methodCall = methodCalls[i];
-                        
-                        // This is calling another microservice if the methodCall 
-                        // has a url parameter defined
-                        if (!("url" in methodCall)){
-                            continue;
-                        }
-                        
-                        let url = methodCall["url"]!;
-                        if (!(url in methods)){
-                            continue;
-                        }
-                        
-                        let http = methodCall["httpMethod"];
-                        let className;
-                        if (arr["implementedTypes"].length == 1){ 
-                            className = arr["implementedTypes"][0];
+            // Handling Services.
+            // Create Service and their Method nodes
+            for (let service of microservice["services"]){
+                let serviceUniqueName = `${nodeName}.${service.name}`;
+                nodes.push({
+                    "nodeName": serviceUniqueName,
+                    "displayName": service.name,
+                    "nodeType": "service", 
+                    "parentMicroservice": nodeName,
+                    "parentController": null,
+                    "parentService": null,
+                    "parameters": null,
+                    "returnType": null
+                });
 
-                        }
-                        else{
-                            className = arr["name"];
-                        }
-
-                        let calledFrom = methodCall["calledFrom"];
-                        let destination = methods[url]["microservice"];
-                        let source = microserviceName;
-                        let parameters = methodCall["parameterContents"];
-                        let connectionKey = `${source}-->${destination}`;
-                        
-                        if (source != destination){
-                            // Check if this connection is already in 
-                            // the connections map
-                            if (!connections.has(connectionKey)) {
-                            const linkIndex = links.length;
-                            connections.set(connectionKey, linkIndex);
-                            links.push({
-                                source,
-                                target: destination,
-                                nodeType: "link",
-                                requests: [
-                                    {
-                                        "destinationUrl": url,
-                                        "sourceMethod": calledFrom,
-                                        "endpointFunction": methodCall["name"],
-                                        "className": className,
-                                        "destinationclassName": methods[url]["className"],
-                                        "type": http,
-                                        "argument": parameters,
-                                        "msReturn": methods[url]["returnType"],
-                                    }
-                                ],
-                                name: connectionKey,
-                                type: "link"
-                            });
-                            } else {
-                                const linkIndex = connections.get(connectionKey)!;
-                                links[linkIndex].requests.push(
-                                    {
-                                        "destinationUrl": url,
-                                        "sourceMethod": calledFrom,
-                                        "endpointFunction": methodCall["name"],
-                                        "className": className,
-                                        "destinationclassName": methods[url]["className"],
-                                        "type": http,
-                                        "argument": parameters,
-                                        "msReturn": methods[url]["returnType"],
-                                    }
-                                );
-                            }
-                        } 
-                    }
+                for (let method of service.methods){
+                    let fullMethodName = `${serviceUniqueName}.${method.name}`;
+                    nodes.push({
+                        "nodeName": fullMethodName,
+                        "displayName": method.name,
+                        "nodeType": "method",
+                        "parentController": null,
+                        "parentService": serviceUniqueName, 
+                        "parentMicroservice": nodeName,
+                        "parameters": method.parameters,
+                        "returnType": method.returnType
+                    });
                 }
             }
         }
 
+        // Second pass - identifying links between all different nodes.
         for (let microservice of filteredMicroservices){
-            let nodeName = microservice["name"];
-            let controllers = microservice["controllers"];
-            let services = microservice["services"];
+            let msName = microservice["name"];
 
-            iterateThrough(services, nodeName);
-            iterateThrough(controllers, nodeName);
+            // Create Hierarchy Links (MS -> Controller/Service -> Method)
+            let msControllers = nodes.filter(n => n.nodeType === 'controller' && n.parentMicroservice === msName);
+            let msServices = nodes.filter(n => n.nodeType === 'service' && n.parentMicroservice === msName);
+
+            msControllers.forEach(controller => {
+                links.push({ source: msName, target: controller.nodeName, nodeType: "hierarchy" });
+                // Link controller to its methods
+                nodes.filter(n => n.nodeType === 'method' && n.parentController === controller.nodeName)
+                     .forEach(method => links.push({ source: controller.nodeName, target: method.nodeName, nodeType: "hierarchy" }));
+
+                // Creating Dependency Links (Controller -> Service)
+                msServices.forEach(service => {
+                    links.push({
+                        source: controller.nodeName,
+                        target: service.nodeName,
+                        name: `${controller.displayName} -> ${service.displayName}`,
+                        nodeType: "dependency" // New type for styling internal calls
+                    });
+                });
+            });
+
+            msServices.forEach(service => {
+                links.push({ source: msName, target: service.nodeName, nodeType: "hierarchy" });
+                 // Link service to its methods
+                nodes.filter(n => n.nodeType === 'method' && n.parentService === service.nodeName)
+                     .forEach(method => links.push({ source: service.nodeName, target: method.nodeName, nodeType: "hierarchy" }));
+            });
+
+            // Create Communication Links (Method -> Method in another Microservice)
+            const processMethodCalls = (componentArray: (Controller | Service)[]) => {
+                for (let component of componentArray) {
+                    for (let func of component.methods) {
+                        for (let methodCall of func.methodCalls) {
+                            const destinationMethod = findMethodByUrl(methodCall.url!, methods);
+                            if (!destinationMethod) continue;
+
+                            let destinationMs = destinationMethod.microservice;
+                            let sourceMs = msName;
+                            
+                            if (sourceMs !== destinationMs) {
+                                let connectionKey = `${sourceMs}-->${destinationMs}`;
+                                if (!connections.has(connectionKey)) {
+                                    connections.set(connectionKey, links.length);
+                                    links.push({
+                                        source: sourceMs,
+                                        target: destinationMs,
+                                        nodeType: "link",
+                                        requests: [],
+                                        name: connectionKey
+                                    });
+                                }
+                                const linkIndex = connections.get(connectionKey)!;
+                                links[linkIndex].requests.push({
+                                    "destinationUrl": methodCall.url,
+                                    "sourceMethod": methodCall.calledFrom,
+                                    "endpointFunction": destinationMethod.methodName,
+                                    "className": component.name,
+                                    "destinationclassName": destinationMethod.className,
+                                    "type": methodCall.httpMethod,
+                                    "argument": methodCall.parameterContents,
+                                    "msReturn": destinationMethod.returnType,
+                                });
+                            }
+                        }
+                    }
+                }
+            };
+            
+            processMethodCalls(microservice.controllers);
+            processMethodCalls(microservice.services);
         }
 
         return {
