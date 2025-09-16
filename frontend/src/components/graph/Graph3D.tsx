@@ -248,13 +248,13 @@ const Graph: React.FC<Props> = ({
                 let geometry;
                 let nodeType = node["nodeType"]?.toUpperCase();
                 if (nodeType === "MICROSERVICE") {
-                    geometry = new THREE.SphereGeometry(6);
+                    geometry = new THREE.SphereGeometry(8);
                 } else if (nodeType === "CONTROLLER" || nodeType === "SERVICE") {
                     geometry = new THREE.SphereGeometry(5);
                 } else if (nodeType === "METHOD") {
                     geometry = new THREE.SphereGeometry(4);
                 } else if (nodeType === "ENTITY") {
-                    geometry = new THREE.BoxGeometry(8, 8, 8); 
+                    geometry = new THREE.BoxGeometry(10, 10, 10); 
                 } 
 
                 const material = new THREE.MeshLambertMaterial({
@@ -291,7 +291,7 @@ const Graph: React.FC<Props> = ({
             }
             linkColor={(link) =>{
                 switch (link.nodeType) {
-                    case 'uses': return 'rgba(128, 0, 128, 0.7)'; // Controller/Service -> Entity
+                    case 'uses': return 'rgba(65, 68, 249, 0.7)'; // Controller/Service -> Entity
                     case 'dependency': return 'rgba(255, 165, 0, 0.7)'; // Controller -> Service
                     case 'hierarchy': return 'rgba(150, 150, 150, 0.5)'; // MS -> Controller/Service -> Method
                     default:

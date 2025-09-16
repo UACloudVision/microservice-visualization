@@ -155,7 +155,7 @@ export const InfoBox = (props: Props) => {
     else if (type === "entity") {
         return (
             <ul
-                className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
+                className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96 w-96
                     bg-white/90 text-slate-800 rounded-xl shadow-lg backdrop-blur-sm 
                     transition-colors duration-300
                     ${show ? `flex` : `hidden`}`}
@@ -225,7 +225,7 @@ export const InfoBox = (props: Props) => {
                             />
                         ))
                     ) : (
-                        <div className="text-sm text-slate-500">Not used by any components in the current view.</div>
+                        <div className="text-sm text-slate-500">Not used by any component.</div>
                     )}
                 </div>
 
@@ -250,7 +250,7 @@ export const InfoBox = (props: Props) => {
         // Methods is not undefined if type is not a microservice and not a link.
         return(
         <ul
-            className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96
+            className={`absolute flex-col top-[10%] left-[60%] z-50 p-4 max-h-96 w-96
                 bg-white/90 text-slate-800 rounded-xl shadow-lg backdrop-blur-sm 
                 transition-colors duration-300
                 ${show ? `flex` : `hidden`}`}
