@@ -5,9 +5,6 @@ import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
-import ColorSelector from "./components/graphMode/VisualModeColorSelector";
-import { setupAxios, setupLogger } from "./utils/axiosSetup";
-import axios from "axios";
 import TrackNodeMenu from "./components/generic/TrackNodeMenu";
 import FilterBox from "./utils/page.js";
 import { BrowserRouter, Router } from "react-router-dom";
@@ -19,9 +16,12 @@ import NotificationToast from "./components/generic/NotificationToast";
 import Footer from "./components/generic/Footer";
 import Instructions from "./components/generic/Instructions";
 import ErrorBoundary from "./components/graph/ErrorBoundary";
-
 import getData, { setNotificationCallback } from "./parsers/getData";
-import compareChanges from "./parsers/getChanges.js";
+
+import axios from "axios";
+import compareChanges from "./parsers/getChanges";
+import { setupAxios, setupLogger } from "./utils/axiosSetup";
+import ColorSelector from "./components/graphMode/VisualModeColorSelector";
 
 interface Notification {
     type: 'error' | 'warning' | 'success' | 'info';
