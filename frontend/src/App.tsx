@@ -1,23 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
-import GraphWrapper from "./components/graph/GraphWrapper";
+
+import { BrowserRouter, Router } from "react-router-dom";
+import { Routes } from "react-router-dom";
+import { Route } from "react-router-dom";
+
+import {Notification, setNotificationCallback, showError, showSuccess} from "./utils/notifications"
+import FilterBox from "./utils/page.js";
+import NewPage from "./utils/node.js";
+
+import NotificationToast from "./components/generic/NotificationToast";
 import GraphMenu from "./components/graphControlMenu/GraphMenu";
+import TrackNodeMenu from "./components/generic/TrackNodeMenu";
+import Instructions from "./components/generic/Instructions";
+import ErrorBoundary from "./components/graph/ErrorBoundary";
+import GraphWrapper from "./components/graph/GraphWrapper";
 import Menu from "./components/graph/RightClickNodeMenu";
 import { InfoBox } from "./components/graph/NodeInfoBox";
 import GraphMode from "./components/graphMode/GraphMode";
 import TimeSlider from "./components/graph/TimeSlider";
-import TrackNodeMenu from "./components/generic/TrackNodeMenu";
-import FilterBox from "./utils/page.js";
-import { BrowserRouter, Router } from "react-router-dom";
-import { Routes } from "react-router-dom";
-import { Route } from "react-router-dom";
-import NewPage from "./utils/node.js";
-import getData from "./parsers/getData";
-import Footer from "./components/generic/Footer";
 import IRFileUpload from "./components/IRFileUpload";
-import Instructions from "./components/generic/Instructions";
-import ErrorBoundary from "./components/graph/ErrorBoundary";
-import NotificationToast from "./components/generic/NotificationToast";
-import {Notification, setNotificationCallback} from "./utils/notifications"
+import Footer from "./components/generic/Footer";
+
+import getData from "./parsers/getData";
 
 import axios from "axios";
 import compareChanges from "./parsers/getChanges";
@@ -62,25 +66,34 @@ function App(data: any) {
     }, []);
 
     useEffect(() => {
-        if (!graphData || !graphData.nodes) return;
-
-        const allMicroserviceIds = graphData.nodes
-            .filter((node: any) => node.nodeType === 'microservice')
-            .map((node: any) => node.nodeName);
-
-        if (isExpandedAll || isHighLevelExpanded) {
-            // If EITHER toggle is on, expand all microservices
-            setExpandedNodes(new Set(allMicroserviceIds));
-        } else {
-            // If BOTH are off, clear all expansions
+        if (!graphData || !Array.isArray(graphData.nodes)) {
             setExpandedNodes(new Set());
+            return;
+        } 
+
+        try {
+            const allMicroserviceIds = graphData.nodes
+                .filter((node: any) => node.nodeType === 'microservice')
+                .map((node: any) => node.nodeName);
+
+            if (isExpandedAll || isHighLevelExpanded) {
+                // If EITHER toggle is on, expand all microservices
+                setExpandedNodes(new Set(allMicroserviceIds));
+            } else {
+                // If BOTH are off, clear all expansions
+                setExpandedNodes(new Set());
+            }
+        } catch (error: any){
+            showError('Error processing graph data for expansion.');
+            setExpandedNodes(new Set()); 
         }
     }, [isExpandedAll, isHighLevelExpanded, graphData]);
 
     useEffect(() => { 
         if (!graphData || !graphData.nodes) return;
 
-        if (isExpandedAll) {
+        try {
+            if (isExpandedAll) {
             // If toggled ON, find all microservice IDs and expand them
             const allMicroserviceIds = graphData.nodes
                 .filter((node) => node.nodeType === 'microservice')
@@ -90,6 +103,9 @@ function App(data: any) {
         } else {
             // If toggled OFF, clear all expansions
             setExpandedNodes(new Set());
+        }
+        } catch (error: any) {
+            showError('Error updating expanded nodes');
         }
     }, [isExpandedAll, graphData?.nodes]);
 
@@ -118,32 +134,12 @@ function App(data: any) {
                 if (typeof currentInstance === "undefined") {
                     setCurrentInstance(0);
                 }
-
-                setNotification({
-                        type: 'success',
-                        message: 'IR file parsed successfully!',
-                        duration: 5000
-                    });
-                console.log("Validation failed. Toast should be visible.");
-
-            } else {
-                setNotification({
-                        type: 'error',
-                        message: 'File validation failed.',
-                        duration: 5000
-                    });
-                console.log("Validation failed. Toast should be visible.");
-            }
-
+                showSuccess('IR file parsed successfully!');
+            } else showError('File validation failed.');
         } catch (error: any) {
-            setNotification({
-                type: 'error',
-                message: `Failed to process JSON: ${error.message}`,
-                duration: 5000
-            });
+            showError(`Failed to process JSON: ${error.message}`);
             return;
         }
-        
     }
 
     if (typeof currentInstance == "undefined" || !graphTimeline) {

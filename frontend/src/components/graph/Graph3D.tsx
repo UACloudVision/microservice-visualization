@@ -11,6 +11,7 @@ import {
 } from "../../utils/graphFunctions";
 import * as THREE from "three";
 import SpriteText from "three-spritetext";
+import { showRenderingError } from "../../utils/notifications";
 
 type Props = {
     width: number;
@@ -60,16 +61,10 @@ const Graph: React.FC<Props> = ({
     setExpandedNodes,
     isHighLevelExpanded
 }) => {
-    const [highlightNodes, setHighlightNodes] = useState<Set<string>>(
-        new Set()
-    );
-    const [highlightLinks, setHighlightLinks] = useState<Set<string>>(
-        new Set()
-    );
-
+    const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
+    const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set());
     const [hoverNode, setHoverNode] = useState(null);
     const [selectedLink, setSelectedLink] = useState(null);
-    
     const [hideNodes, setHideNodes] = useState<any>(new Set());
     const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -101,37 +96,43 @@ const Graph: React.FC<Props> = ({
 
     // Memoized function to filter data based on expanded nodes.
     const visibleData = useMemo(() => {
-        const { nodes: allNodes, links: allLinks } = sharedProps.graphData || { nodes: [], links: [] };
-        if (!allNodes || allNodes.length === 0) {
+        try {
+            const { nodes: allNodes, links: allLinks } = 
+                sharedProps.graphData || { nodes: [], links: [] };
+        
+            if (!allNodes || allNodes.length === 0) {
+                return { nodes: [], links: [] };
+            }
+
+            let visibleNodes;
+
+            if (isHighLevelExpanded) {
+                visibleNodes = allNodes.filter((node: any) => node.nodeType !== 'method');
+            } else {
+                const relevantUsesLinks = allLinks.filter((link: any) =>
+                    link.nodeType === 'uses' && 
+                    allNodes.find((n: any) => (n.nodeName === (link.source.nodeName || link.source)) && expandedNodes.has(n.parentMicroservice))
+                );
+                const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
+
+                visibleNodes = allNodes.filter((node: any) =>
+                    node.nodeType === 'microservice' ||
+                    expandedNodes.has(node.parentMicroservice) ||
+                    (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
+                );
+            }
+
+            const visibleNodeIds = new Set(visibleNodes.map((n: any) => n.nodeName));
+            const visibleLinks = allLinks.filter((link: any) =>
+                visibleNodeIds.has(link.source?.nodeName || link.source) &&
+                visibleNodeIds.has(link.target?.nodeName || link.target)
+            );
+
+            return { nodes: visibleNodes, links: visibleLinks };
+        } catch (error: any) {
+            showRenderingError('Graph rendering failed!');
             return { nodes: [], links: [] };
         }
-
-        let visibleNodes;
-
-        if (isHighLevelExpanded) {
-            visibleNodes = allNodes.filter((node: any) => node.nodeType !== 'method');
-        } else {
-            const relevantUsesLinks = allLinks.filter((link: any) =>
-                link.nodeType === 'uses' && 
-                allNodes.find((n: any) => (n.nodeName === (link.source.nodeName || link.source)) && expandedNodes.has(n.parentMicroservice))
-            );
-            const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
-
-            visibleNodes = allNodes.filter((node: any) =>
-                node.nodeType === 'microservice' ||
-                expandedNodes.has(node.parentMicroservice) ||
-                (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
-            );
-        }
-
-        const visibleNodeIds = new Set(visibleNodes.map((n: any) => n.nodeName));
-        const visibleLinks = allLinks.filter((link: any) =>
-            visibleNodeIds.has(link.source?.nodeName || link.source) &&
-            visibleNodeIds.has(link.target?.nodeName || link.target)
-        );
-
-        return { nodes: visibleNodes, links: visibleLinks };
-
     }, [sharedProps.graphData, expandedNodes]);
 
     const handleNodeHover = (node: any) => {

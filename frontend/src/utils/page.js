@@ -72,15 +72,12 @@ export default function FilterBox(values) {
     }
     let data = getGraphData(values["graphTimeline"][values["currentInstance"]], nodes);
 
-
     let connections = getConnections(values["graphTimeline"][values["currentInstance"]], nodes, data["links"],);
     navigate('/node', { state: JSON.stringify(connections) });
 
   }
-
   return null;
 };
-
 
 // CSS-in-JS styles
 const styles = {
