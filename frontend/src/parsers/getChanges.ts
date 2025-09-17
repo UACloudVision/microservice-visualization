@@ -1,4 +1,5 @@
-import type { IRData, Microservice, Controller, Service, Method, MethodCall } from './getData';
+import type { IRData, Controller, Service} from './getData';
+import { showError } from '../utils/notifications';
 
 interface ComparisonGraph {
     nodes: any[];
@@ -6,7 +7,14 @@ interface ComparisonGraph {
     gitCommitId?: string;
 }
 
+const EMPTY_GRAPH: ComparisonGraph = { nodes: [], links: [], gitCommitId: 'unknown' };
+
 function getComparisonData(irData: IRData, nodes_array?: string[]): ComparisonGraph {
+    if (!irData || !Array.isArray(irData.microservices)) {
+        showError("Invalid or missing IR data provided for comparison.");
+        return EMPTY_GRAPH;
+    }
+    
     let microservices = irData.microservices;
     let nodes: any[] = [];
     let internalLinks: any[] = [];
@@ -17,73 +25,78 @@ function getComparisonData(irData: IRData, nodes_array?: string[]): ComparisonGr
         ? microservices.filter(ms => nodes_array.includes(ms.name))
         : microservices;
 
-    // First pass: Collecting all microservice nodes and endpoint methods.
-    for (let microservice of filteredMicroservices) {
-        nodes.push({
-            "nodeName": microservice.name, 
-            "nodeType": "microservice", 
-            "displayName": microservice.name,
-            "parentMicroservice": null, 
-            "parentController": null, 
-            "parentService": null,
-        });
-        const collectMethods = (components: (Controller | Service)[]) => {
-            for (const component of components) {
-                for (const method of component.methods) {
-                    if (method.url) methods[method.url] = { "microservice": microservice.name, "methodName": method.name, ...method };
+    try {
+        // First pass: Collecting all microservice nodes and endpoint methods.
+        for (let microservice of filteredMicroservices) {
+            nodes.push({
+                "nodeName": microservice.name, 
+                "nodeType": "microservice", 
+                "displayName": microservice.name,
+                "parentMicroservice": null, 
+                "parentController": null, 
+                "parentService": null,
+            });
+            const collectMethods = (components: (Controller | Service)[]) => {
+                for (const component of components) {
+                    for (const method of component.methods) {
+                        if (method.url) methods[method.url] = { "microservice": microservice.name, "methodName": method.name, ...method };
+                    }
                 }
-            }
-        };
-        collectMethods(microservice.controllers);
-        collectMethods(microservice.services);
-    }
-    
-    // Second pass: Creating links for inter-service communication.
-    for (const microservice of filteredMicroservices) {
-        const processMethodCalls = (components: (Controller | Service)[]) => {
-            for (const component of components) {
-                for (const func of component.methods) {
-                    for (const methodCall of func.methodCalls) {
-                        if (!methodCall.url || !methods[methodCall.url]) 
-                            continue;
-                        
-                        const destinationMs = methods[methodCall.url].microservice;
-                        const sourceMs = microservice.name;
+            };
+            collectMethods(microservice.controllers);
+            collectMethods(microservice.services);
+        }
+        
+        // Second pass: Creating links for inter-service communication.
+        for (const microservice of filteredMicroservices) {
+            const processMethodCalls = (components: (Controller | Service)[]) => {
+                for (const component of components) {
+                    for (const func of component.methods) {
+                        for (const methodCall of func.methodCalls) {
+                            if (!methodCall.url || !methods[methodCall.url]) 
+                                continue;
+                            
+                            const destinationMs = methods[methodCall.url].microservice;
+                            const sourceMs = microservice.name;
 
-                        if (sourceMs !== destinationMs) {
-                            const connectionKey = `${sourceMs}-->${destinationMs}`;
-                            if (!internalConnections.has(connectionKey)) {
-                                internalConnections.set(connectionKey, internalLinks.length);
-                                internalLinks.push({
-                                    source: sourceMs, target: destinationMs, name: connectionKey,
-                                    nodeType: "link", requests: [],
+                            if (sourceMs !== destinationMs) {
+                                const connectionKey = `${sourceMs}-->${destinationMs}`;
+                                if (!internalConnections.has(connectionKey)) {
+                                    internalConnections.set(connectionKey, internalLinks.length);
+                                    internalLinks.push({
+                                        source: sourceMs, target: destinationMs, name: connectionKey,
+                                        nodeType: "link", requests: [],
+                                    });
+                                }
+                                const linkIndex = internalConnections.get(connectionKey)!;
+                                internalLinks[linkIndex].requests.push({
+                                    "destinationUrl": methodCall.url,
+                                    "sourceMethod": methodCall.calledFrom,
+                                    "endpointFunction": methods[methodCall.url].methodName,
+                                    "className": component.name,
+                                    "destinationclassName": methods[methodCall.url].className,
+                                    "type": methodCall.httpMethod,
+                                    "argument": methodCall.parameterContents,
+                                    "msReturn": methods[methodCall.url].returnType,
                                 });
                             }
-                            const linkIndex = internalConnections.get(connectionKey)!;
-                            internalLinks[linkIndex].requests.push({
-                                "destinationUrl": methodCall.url,
-                                "sourceMethod": methodCall.calledFrom,
-                                "endpointFunction": methods[methodCall.url].methodName,
-                                "className": component.name,
-                                "destinationclassName": methods[methodCall.url].className,
-                                "type": methodCall.httpMethod,
-                                "argument": methodCall.parameterContents,
-                                "msReturn": methods[methodCall.url].returnType,
-                            });
                         }
                     }
                 }
-            }
-        };
-        processMethodCalls(microservice.controllers);
-        processMethodCalls(microservice.services);
-    }
+            };
+            processMethodCalls(microservice.controllers);
+            processMethodCalls(microservice.services);
+        }
 
-    return {
-        "nodes": nodes,
-        "links": internalLinks, 
-        "gitCommitId": irData.commitID
-    };
+        return {
+            "nodes": nodes,
+            "links": internalLinks, 
+            "gitCommitId": irData.commitID
+        };
+    } catch (error: any) {
+        showError('Failed to parse comparison data.');
+        return EMPTY_GRAPH;
+    }  
 }
 
 // Finding differences.
@@ -161,7 +174,17 @@ function findModifications(graph1: ComparisonGraph, graph2: ComparisonGraph) {
  * @returns A graph data object with color-coded changes.
  */
 export default function compareChanges(commit1: IRData, commit2: IRData) {
-    const graph1 = getComparisonData(commit1);
-    const graph2 = getComparisonData(commit2);
-    return findModifications(graph1, graph2);
+    if (!commit1 || !commit2) {
+        showError("One or both commits are missing for comparison.");
+        return null;
+    }
+
+    try {
+        const graph1 = getComparisonData(commit1);
+        const graph2 = getComparisonData(commit2);
+        return findModifications(graph1, graph2);
+    } catch (error: any) {
+        showError("Error occured in comparison.");
+        return null;
+    } 
 }

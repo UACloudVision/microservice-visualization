@@ -1,12 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import NotificationToast from './generic/NotificationToast';
-
-interface Notification {
-    type: 'error' | 'warning' | 'success' | 'info';
-    message: string;
-    duration?: number;
-}
+import { Notification } from '../utils/notifications';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;

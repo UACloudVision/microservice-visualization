@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-interface Notification {
-    type: 'error' | 'warning' | 'success' | 'info';
-    message: string;
-    duration?: number;
-}
+import { Notification } from '../../utils/notifications';
 
 interface NotificationToastProps {
     notification: Notification | null;

@@ -11,23 +11,18 @@ import { BrowserRouter, Router } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import NewPage from "./utils/node.js";
-import IRFileUpload from "./components/IRFileUpload";
-import NotificationToast from "./components/generic/NotificationToast";
+import getData from "./parsers/getData";
 import Footer from "./components/generic/Footer";
+import IRFileUpload from "./components/IRFileUpload";
 import Instructions from "./components/generic/Instructions";
 import ErrorBoundary from "./components/graph/ErrorBoundary";
-import getData, { setNotificationCallback } from "./parsers/getData";
+import NotificationToast from "./components/generic/NotificationToast";
+import {Notification, setNotificationCallback} from "./utils/notifications"
 
 import axios from "axios";
 import compareChanges from "./parsers/getChanges";
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
 import ColorSelector from "./components/graphMode/VisualModeColorSelector";
-
-interface Notification {
-    type: 'error' | 'warning' | 'success' | 'info';
-    message: string;
-    duration?: number;
-}
 
 function App(data: any) {
     const graphRef = useRef();
@@ -151,10 +146,6 @@ function App(data: any) {
         
     }
 
-    const handleNotificationClose = () => {
-        setNotification(null);
-    };
-
     if (typeof currentInstance == "undefined" || !graphTimeline) {
         return (
             <BrowserRouter>
@@ -178,7 +169,7 @@ function App(data: any) {
                     {/* Toast floats independently */}
                     <NotificationToast
                     notification={notification}
-                    onClose={handleNotificationClose}
+                    onClose={() => setNotification(null)}
                     />
 
                     {/* Footer stays at bottom */}
@@ -193,33 +184,33 @@ function App(data: any) {
           <Route path="/" element=  
         
         {<div className={`max-w-full min-h-screen max-h-screen overflow-clip ${isDark ? `bg-gray-900` : `bg-gray-100`}`} ref={ref}>
-            {/* Upper left mode toggle */}
-            <GraphMode
-                value={value}
-                setValue={setValue}
-                antiPattern={antiPattern}
-                setAntiPattern={setAntiPattern}
-                selectedAntiPattern={selectedAntiPattern}
-                setSelectedAntiPattern={setSelectedAntiPattern}
-                graphData={graphData}
-                currentInstance={currentInstance}
-                graphTimeline={graphTimeline}
-            />*
-            
-            {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
-            <FilterBox
-                key={`${currentInstance}-${trackChanges}`}
-                graphData={graphData} 
-                currentInstance={currentInstance}
-                graphTimeline={graphTimeline}
-                trackChanges={trackChanges}
-            ></FilterBox>
-
-            <IRFileUpload onFileSelect={onFileUpload} />
-
-            <Instructions />
-            
             <ErrorBoundary setNotification={setNotification}>
+                {/* Upper left mode toggle */}
+                <GraphMode
+                    value={value}
+                    setValue={setValue}
+                    antiPattern={antiPattern}
+                    setAntiPattern={setAntiPattern}
+                    selectedAntiPattern={selectedAntiPattern}
+                    setSelectedAntiPattern={setSelectedAntiPattern}
+                    graphData={graphData}
+                    currentInstance={currentInstance}
+                    graphTimeline={graphTimeline}
+                />*
+                
+                {/*Filter box contianing a list of all visable microservices. Uses the currentInstance of trackChanges variables as keys for when to update the box */}
+                <FilterBox
+                    key={`${currentInstance}-${trackChanges}`}
+                    graphData={graphData} 
+                    currentInstance={currentInstance}
+                    graphTimeline={graphTimeline}
+                    trackChanges={trackChanges}
+                ></FilterBox>
+
+                <IRFileUpload onFileSelect={onFileUpload} />
+
+                <Instructions />
+            
                 {/* Graph Menu on upper right with buttons */}
                 <GraphMenu
                     graphRef={graphRef}
@@ -322,7 +313,7 @@ function App(data: any) {
 
         <NotificationToast 
             notification={notification} 
-            onClose={handleNotificationClose} 
+            onClose={() => setNotification(null)} 
         />
 
         </BrowserRouter>

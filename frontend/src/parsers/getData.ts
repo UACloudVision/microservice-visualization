@@ -1,28 +1,5 @@
-// Define the notification interface
-interface Notification {
-    type: 'error' | 'warning' | 'success' | 'info';
-    message: string;
-    duration?: number;
-}
 
-// Error notification for errorenous IR files.
-let notificationCallback: ((notification: Notification) => void) | null = null;
-
-export function setNotificationCallback(callback: (notification: Notification) => void): void {
-    notificationCallback = callback;
-}
-
-function showError(message: string): void {
-    if (notificationCallback) {
-        notificationCallback({
-            type: 'error',
-            message: message,
-            duration: 5000 // 5 seconds
-        });
-    } else {
-        console.error('File parsing error:', message);
-    }
-}
+import { showError } from '../utils/notifications';
 
 // Define types for better type safety
 export interface Method {
@@ -207,9 +184,11 @@ export default function getData(myData: IRData | null, nodes_array?: string[] | 
                     "parameters": null,
                     "returnType": null
                 });
-
-                for (let method of service.methods){
-                    let fullMethodName = `${serviceUniqueName}.${method.name}`;
+                
+                let services = service.methods;
+                for(let k=0; k<services.length; k++){
+                    let method = services[k];
+                    let fullMethodName = `${serviceUniqueName}.${method.name}._${k}`;
                     nodes.push({
                         "nodeName": fullMethodName,
                         "displayName": method.name,
