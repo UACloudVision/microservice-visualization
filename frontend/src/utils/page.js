@@ -2,7 +2,7 @@
 import { useState } from "react";
 import getGraphData from "../parsers/getData";
 import { useNavigate } from "react-router-dom";
-import getConnections from "./createConnections.js"
+import getConnections from "./createConnections"
 
 function getData(data) {
 
