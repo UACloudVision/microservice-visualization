@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 type Props = {
     initOpen?: boolean;
-    svg: any;
+    svg: any | null;
     title: any;
     body: any;
 };
@@ -14,8 +14,8 @@ const CollapsableBox: React.FC<Props> = ({ initOpen, svg, title, body }) => {
             <h2 className="mb-0" id="headingOne">
                 <button
                     className="group relative flex w-full items-center rounded-t-md border-0 
-                bg-white p-1 text-left text-base text-neutral-800 transition
-                font-medium uppercase"
+                    bg-white p-1 text-left text-base text-neutral-800 transition
+                    font-medium uppercase"
                     type="button"
                     aria-controls="collapseOne"
                     onClick={(e) => setOpen(!open)}
@@ -23,7 +23,7 @@ const CollapsableBox: React.FC<Props> = ({ initOpen, svg, title, body }) => {
                     {title}
                     <span
                         className={`ml-auto h-5 w-5 shrink-0  fill-[#336dec] 
-                duration-200 ease-in-out ${open ? `rotate-180` : ``}`}
+                        duration-200 ease-in-out ${open ? `rotate-180` : ``}`}
                     >
                         {svg}
                     </span>

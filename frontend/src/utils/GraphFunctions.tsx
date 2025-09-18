@@ -1,9 +1,10 @@
 import { ColorRepresentation } from "three";
-import { Antipattern, Node } from "../types";
+import { Antipattern} from "./types";
 
 const RED = "rgb(255,0,0)";
 const ORANGE = "rgb(255,160,0)";
 const GREEN = "rgb(0,255,0)";
+const NEWGREEN = "rgba(0, 255, 204, 0.79)";
 const HOVER_BLUE = "rgb(89, 130, 255)";
 const HOVER_NEIGHBOR = "rgb(79, 200, 209)";
 const LIGHT_GRAY = "rgb(150,150,150)";
@@ -13,6 +14,14 @@ const IN_PATTERN = "rgb(235,52,192)";
 
 const LINK_FROM_HOVER = "rgba(52, 143, 235,1)";
 const LINK_TO_HOVER = "rgba(179, 66, 245,1)";
+
+const NODE_COLORS = {
+    "microservice": LIGHT_GRAY,
+    "controller": LINK_TO_HOVER,
+    "service": ORANGE,
+    "method": HOVER_BLUE,
+    "entity": NEWGREEN
+}
 
 function getShape(type: String): number {
     if (type === "service") {
@@ -77,6 +86,12 @@ function getColor(
             return HOVER_NEIGHBOR;
         }
     }
+
+    const nodeType = node.nodeType as keyof typeof NODE_COLORS;
+    if(NODE_COLORS[nodeType]) {
+        return NODE_COLORS[nodeType];
+    }
+
     if (focusNode) {
         if (focusNode.node === node.nodeName) {
             return HOVER_BLUE;
@@ -96,7 +111,7 @@ function getColor(
     if (antipattern && selectedAntiPattern != "none") {
         switch (selectedAntiPattern) {
             case "Cyclic Dependency":
-                const cyclic = node.patterns.find(
+                const cyclic = node.patterns?.find(
                     (pattern: Antipattern) =>
                         pattern.type === "Cyclic Dependency"
                 );
@@ -273,45 +288,36 @@ function getColorThreshold(
 }
 
 // Find neighbors of a given node
-function getNeighbors(node: any, nodes: any, links: any) {
+function getNeighbors(node: any, nodes: any[], links: any[]) {
+    const neighbors = links.reduce((acc: any[], link: any) => {
+        // Adding additional checks to ensure link and its properties are valid.
+        if (!link || !link.source || !link.target || !node) return acc;
+        let sourceName = link.source.nodeName || link.source;
+        let targetName = link.target.nodeName || link.target;
+
+        if (targetName === node.nodeName) {
+            // Finding the full node object if source is just an ID.
+            const sourceNode = typeof link.source === 'string' ? 
+                nodes.find(n => n.nodeName === link.source) : link.source;
+            if (sourceNode) acc.push(sourceNode);
+        } else if (sourceName === node.nodeName) {
+            // Finding the full node object if target is just an ID.
+            const targetNode = typeof link.target === 'string' ? 
+                nodes.find(n => n.nodeName === link.target) : link.target;
+            if (targetNode) acc.push(targetNode);
+        }
+        return acc;
+    }, []);
+    
     return {
         nodeLinks: links.filter((link: any) => {
-            return (
-                link.source === node?.nodeName ||
-                link.target === node?.nodeName ||
-                link.source?.nodeName === node?.nodeName ||
-                link.target?.nodeName === node?.nodeName
-            );
+            // Adding additional checks to ensure link and its properties are valid.
+            if (!link || !link.source || !link.target || !node) return false;
+            let sourceName = link.source.nodeName || link.source;
+            let targetName = link.target.nodeName || link.target;
+            return sourceName === node.nodeName || targetName === node.nodeName;
         }),
-        nodes: links.reduce((neighbors: any, link: any) => {
-            let sourceNode, destNode;
-
-            // Special case where link is not yet containing physical nodes
-            if (typeof link.source === "string") {
-                sourceNode = nodes.find(
-                    (node: any) => node.nodeName === link.source
-                );
-                destNode = nodes.find(
-                    (node: any) => node.nodeName === link.source
-                );
-            } else {
-                sourceNode = link.source;
-                destNode = link.target;
-            }
-
-            if (
-                link.target.nodeName === node.nodeName ||
-                link.target == node.nodeName
-            ) {
-                neighbors.push(sourceNode);
-            } else if (
-                link.source.nodeName === node.nodeName ||
-                link.source == node.nodeName
-            ) {
-                neighbors.push(destNode);
-            }
-            return neighbors;
-        }, []),
+        nodes: neighbors
     };
 }
 
@@ -337,6 +343,7 @@ const getNodeOpacity = (
     focusNode: any
 ): number => {
     const FOCUS_ACTIVE_NOT_SELECTED = 0.05;
+    // When the search is inactive.
     if (search === "") {
         if (
             focusNode &&
@@ -345,7 +352,7 @@ const getNodeOpacity = (
                     (neighbor: any) => neighbor === node.nodeName
                 ))
         ) {
-            return 0.9;
+            return 1.0;
         }
         if (highlightNodes.size === 0) {
             if (focusNode) {
@@ -358,8 +365,10 @@ const getNodeOpacity = (
             : focusNode
             ? FOCUS_ACTIVE_NOT_SELECTED
             : 0.5;
-    } else if (node.nodeName.toLowerCase().includes(search.toLowerCase())) {
-        return 0.9;
+    } 
+    // When the search is active.
+    else if (node.nodeName.toLowerCase().includes(search.toLowerCase())) {
+        return 1.0;
     } else if (
         focusNode &&
         (focusNode.node === node.nodeName ||
@@ -421,7 +430,7 @@ function getLinkOpacity(
             link.target.nodeName.toLowerCase().includes(search.toLowerCase())
         ) {
             if (threed) {
-                return 0.9;
+                return 1.0;
             }
         } else {
             if (threed) {
@@ -436,7 +445,7 @@ function getLinkOpacity(
             link.source.nodeName === focusNode.node ||
             link.target.nodeName === focusNode.node
         ) {
-            return 0.9;
+            return 1.0;
         } else {
             return 0.2;
         }
@@ -458,6 +467,9 @@ function getLinkColor(
     focusNode: any,
     showChanges: any)
 {  
+    if (link.nodeType === 'hierarchy') {
+        return 'rgba(150, 150, 150, 0.5)'; 
+    }
     if (
         link.source.nodeName === hoverNode ||
         (focusNode && link.source.nodeName === focusNode.node)
@@ -528,6 +540,10 @@ function getLinkWidth(
     antiPattern: boolean,
     selectedAntiPattern: string
 ) {
+    if (link.nodeType === 'hierarchy') {
+        return 1; 
+    }
+
     let size = (link.requests?.length ?? 0) + 2;
     if (antiPattern) {
         if (
@@ -545,10 +561,10 @@ function getLinkWidth(
 
 function linkInAntiPattern(link: any, selectedAntiPattern: any) {
     return (
-        link.source.patterns?.find(
+        link.source?.patterns?.find(
             (pattern: any) => pattern.type === selectedAntiPattern
         ) &&
-        link.target.patterns?.find(
+        link.target?.patterns?.find(
             (pattern: any) => pattern.type === selectedAntiPattern
         )
     );

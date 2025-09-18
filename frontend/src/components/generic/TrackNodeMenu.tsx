@@ -43,7 +43,6 @@ const TrackNodeMenu: React.FC<Props> = ({
         }
     }
 
-
     React.useEffect(() => {
 
     }, [trackNodes]);

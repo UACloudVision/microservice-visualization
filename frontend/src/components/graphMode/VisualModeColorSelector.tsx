@@ -48,7 +48,7 @@ const ColorSelector: React.FC<Props> = ({
     };
 
     return (
-        <div className="absolute top-2 right-48 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-44">
+        <div className="absolute top-80 left-4 z-50 flex flex-col gap-2 text-sm bg-blue-300 bg-opacity-60 rounded-lg p-4 w-1/6">
             <div>
                 <button
                     type="button"
@@ -95,54 +95,6 @@ const ColorSelector: React.FC<Props> = ({
                                 </div>
                             </button>
                         </li>
-                        {/*<li>
-                            <button
-                                type="button"
-                                onClick={handleSelectMode}
-                                value={"latency"}
-                                className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
-                            >
-                                <div className="inline-flex items-center">
-                                    Response Time
-                                </div>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                onClick={handleSelectMode}
-                                value={"cpu"}
-                                className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
-                            >
-                                <div className="inline-flex items-center">
-                                    CPU Load
-                                </div>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                onClick={handleSelectMode}
-                                value={"ram"}
-                                className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
-                            >
-                                <div className="inline-flex items-center">
-                                    RAM Load
-                                </div>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                onClick={handleSelectMode}
-                                value={"disk"}
-                                className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
-                            >
-                                <div className="inline-flex items-center">
-                                    Disk Usage
-                                </div>
-                            </button>
-                        </li>*/}
                         <li>
                             <button
                                 type="button"

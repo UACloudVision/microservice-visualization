@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import ForceGraph3D from "react-force-graph-3d";
 import { ForceGraphProps as SharedProps } from "react-force-graph-2d";
 import {
@@ -8,9 +8,10 @@ import {
     getNeighbors,
     getNodeOpacity,
     getVisibility,
-} from "../../utils/GraphFunctions";
+} from "../../utils/graphFunctions";
 import * as THREE from "three";
 import SpriteText from "three-spritetext";
+import { showRenderingError } from "../../utils/notifications";
 
 type Props = {
     width: number;
@@ -32,6 +33,9 @@ type Props = {
     focusNode: any;
     endpointCalls: any;
     trackChanges: any;
+    expandedNodes: Set<string>;
+    isHighLevelExpanded: boolean;
+    setExpandedNodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
 const Graph: React.FC<Props> = ({
@@ -53,107 +57,171 @@ const Graph: React.FC<Props> = ({
     focusNode,
     endpointCalls,
     trackChanges,
+    expandedNodes,
+    setExpandedNodes,
+    isHighLevelExpanded
 }) => {
-    const [highlightNodes, setHighlightNodes] = useState<Set<string>>(
-        new Set()
-    );
-    const [highlightLinks, setHighlightLinks] = useState<Set<string>>(
-        new Set()
-    );
-
+    const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
+    const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set());
     const [hoverNode, setHoverNode] = useState(null);
     const [selectedLink, setSelectedLink] = useState(null);
     const [hideNodes, setHideNodes] = useState<any>(new Set());
+    const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // On page load
     useEffect(() => {
-        let { x, y, z } = graphRef.current.cameraPosition();
+        if (graphRef.current) {
+            let { x, y, z } = graphRef.current.cameraPosition();
 
-        setInitCoords({ x, y, z });
-        setInitRotation(graphRef.current.camera().quaternion);
-        graphRef.current.d3Force("charge").strength((node: any) => {
-            return -500;
-        });
-        graphRef.current.d3Force("link").distance((link: any) => {
-            return 80;
-        });
+            setInitCoords({ x, y, z });
+            setInitRotation(graphRef.current.camera().quaternion);
+            graphRef.current.d3Force("charge").strength(-500);
+            graphRef.current.d3Force("link").distance(80);
+        }
     }, []);
 
-    const handleNodeHover = (node: any) => {
-        highlightNodes.clear();
-        highlightLinks.clear();
+    // Double-click handler to expand/collapse nodes.
+    const handleNodeDoubleClick = useCallback((node: any) => {
+        // Only allow expanding/collapsing microservice nodes
+        if (node.nodeType !== 'microservice') return;
 
+        const newExpandedNodes = new Set(expandedNodes);
+        if (newExpandedNodes.has(node.nodeName)) {
+            newExpandedNodes.delete(node.nodeName);
+        } else {
+            newExpandedNodes.add(node.nodeName);
+        }
+        setExpandedNodes(newExpandedNodes);
+    }, [expandedNodes]);
+
+    // Memoized function to filter data based on expanded nodes.
+    const visibleData = useMemo(() => {
+        try {
+            const { nodes: allNodes, links: allLinks } = 
+                sharedProps.graphData || { nodes: [], links: [] };
+        
+            if (!allNodes || allNodes.length === 0) {
+                return { nodes: [], links: [] };
+            }
+
+            let visibleNodes;
+
+            if (isHighLevelExpanded) {
+                visibleNodes = allNodes.filter((node: any) => node.nodeType !== 'method');
+            } else {
+                const relevantUsesLinks = allLinks.filter((link: any) =>
+                    link.nodeType === 'uses' && 
+                    allNodes.find((n: any) => (n.nodeName === (link.source.nodeName || link.source)) && expandedNodes.has(n.parentMicroservice))
+                );
+                const visibleEntityIds = new Set(relevantUsesLinks.map((link: any) => link.target.nodeName || link.target));
+
+                visibleNodes = allNodes.filter((node: any) =>
+                    node.nodeType === 'microservice' ||
+                    expandedNodes.has(node.parentMicroservice) ||
+                    (node.nodeType === 'entity' && visibleEntityIds.has(node.nodeName))
+                );
+            }
+
+            const visibleNodeIds = new Set(visibleNodes.map((n: any) => n.nodeName));
+            const visibleLinks = allLinks.filter((link: any) =>
+                visibleNodeIds.has(link.source?.nodeName || link.source) &&
+                visibleNodeIds.has(link.target?.nodeName || link.target)
+            );
+
+            return { nodes: visibleNodes, links: visibleLinks };
+        } catch (error: any) {
+            showRenderingError('Graph rendering failed!');
+            return { nodes: [], links: [] };
+        }
+    }, [sharedProps.graphData, expandedNodes]);
+
+    const handleNodeHover = (node: any) => {
+        const newHighlightNodes = new Set<string>();
+        const newHighlightLinks = new Set<string>();
+    
         if (node) {
-            highlightNodes.add(node.nodeName);
+            newHighlightNodes.add(node.nodeName);
             setHoverNode(node.nodeName);
             const neighbors = getNeighbors(
                 node,
-                sharedProps.graphData?.nodes,
-                sharedProps.graphData?.links
+                visibleData.nodes,
+                visibleData.links
             );
-            neighbors.nodes.forEach((node: any) =>
-                highlightNodes.add(node.nodeName)
+            neighbors.nodes.forEach((neighbor: any) =>
+                newHighlightNodes.add(neighbor.nodeName)
             );
             neighbors.nodeLinks.forEach((link: any) =>
-                highlightLinks.add(link.name)
+                newHighlightLinks.add(link.name)
             );
+        } else {
+            setHoverNode(null);
         }
-        updateHighlight();
+    
+        setHighlightNodes(newHighlightNodes);
+        setHighlightLinks(newHighlightLinks);
     };
 
     const handleLinkHover = (link: any) => {
-        highlightNodes.clear();
-        highlightLinks.clear();
+        // ... (existing implementation is fine)
+        const newHighlightNodes = new Set<string>();
+        const newHighlightLinks = new Set<string>();
 
         if (link) {
-            highlightLinks.add(link.name);
-            highlightNodes.add(link.source);
-            highlightNodes.add(link.target);
+            newHighlightLinks.add(link.name);
+            newHighlightNodes.add(link.source.nodeName || link.source);
+            newHighlightNodes.add(link.target.nodeName || link.target);
         }
-
-        updateHighlight();
+        
+        setHighlightNodes(newHighlightNodes);
+        setHighlightLinks(newHighlightLinks);
     };
 
-    const updateHighlight = () => {
-        setHighlightNodes(highlightNodes);
-        setHighlightLinks(highlightLinks);
-        graphRef.current.refresh();
-    };
+    // On link click.
+    const handleLinkClick = useCallback((link: any) => {
+        const event = new CustomEvent("linkClick", {
+            detail: { link: link },
+        });
+        document.dispatchEvent(event);
+    }, []);
 
     // On node left click - zoom in on the node and pull up info box
-    const handleNodeClick = useCallback(
-        (node: any) => {
-            if (node != null) {
-                if (graphRef.current) {
-                    console.log(graphRef.current.camera());
-                    const camPos = graphRef.current.camera().position;
+    const handleNodeClick = useCallback((node: any) => {
+        // If a timeout is already running, it means this is a double-click
+        if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+            clickTimeoutRef.current = null;
+            handleNodeDoubleClick(node); // Execute double-click logic
+        } else {
+            // Otherwise, it's a single-click. Set a timeout.
+            clickTimeoutRef.current = setTimeout(() => {
+                // This code runs if no second click happens within 300ms
+                if (node != null && graphRef.current) {
                     graphRef.current.cameraPosition(
-                        {
-                            x: camPos.x,
-                            y: camPos.y,
-                            z: camPos.z,
-                        },
+                        {...graphRef.current.cameraPosition()},
                         node,
-                        2500
+                        1000
                     );
+                    
+                    const event = new CustomEvent("nodeClick", {
+                        detail: { node: node },
+                    });
+                    document.dispatchEvent(event);
                 }
-                const event = new CustomEvent("nodeClick", {
-                    detail: { node: node },
-                });
-                document.dispatchEvent(event);
-            }
-        },
-        [graphRef]
-    );
+                clickTimeoutRef.current = null;
+            }, 300); // 300ms is a standard double-click threshold
+        }
+    }, [graphRef, handleNodeDoubleClick]);
     
-
     return (
         <ForceGraph3D
             ref={graphRef}
-            graphData={sharedProps.graphData}
+            graphData={visibleData}
             nodeId={"nodeName"}
             width={width}
             height={height}
+            onNodeClick={handleNodeClick}
+            
+            // Your Custom Node Logic (unchanged)
             nodeVisibility={(node) => getVisibility(node, hideNodes)}
             onNodeRightClick={(node: any) => {
                 const event = new CustomEvent("nodecontextmenu", {
@@ -173,95 +241,84 @@ const Graph: React.FC<Props> = ({
             }}
             nodeThreeObject={(node: any) => {
                 const color = getColor(
-                    node,
-                    sharedProps.graphData,
-                    threshold,
-                    highlightNodes,
-                    hoverNode,
-                    defNodeColor,
-                    setDefNodeColor,
-                    antiPattern,
-                    colorMode,
-                    selectedAntiPattern,
-                    trackNodes,
-                    focusNode,
-                    trackChanges
+                    node, sharedProps.graphData, threshold, highlightNodes,
+                    hoverNode, defNodeColor, setDefNodeColor, antiPattern,
+                    colorMode, selectedAntiPattern, trackNodes, focusNode, trackChanges
                 );
                 
-                let func;
-               
-                if (node["nodeType"] === "SERVICE"){
-                    func = new THREE.SphereGeometry(10);
+                let geometry;
+                let nodeType = node["nodeType"]?.toUpperCase();
+                if (nodeType === "MICROSERVICE") {
+                    geometry = new THREE.SphereGeometry(8);
+                } else if (nodeType === "CONTROLLER" || nodeType === "SERVICE") {
+                    geometry = new THREE.SphereGeometry(5);
+                } else if (nodeType === "METHOD") {
+                    geometry = new THREE.SphereGeometry(4);
+                } else if (nodeType === "ENTITY") {
+                    geometry = new THREE.BoxGeometry(10, 10, 10); 
+                } 
 
-                }
-                else if (node["nodeType"] === "CONTROLLER"){
-                    func = new THREE.BoxGeometry(15, 15, 15);
-
-                }
-                 else if (node["nodeType"] === "REPOSITORY"){
-                        func = new THREE.ConeGeometry(10, 15);
-
-                }
-                else if (node["nodeType"] === "ENTITY"){
-                        func = new THREE.CylinderGeometry(10, 10, 20);
-                    }
-                else{
-                    func = new THREE.SphereGeometry(5)
-                }
-                
-                const nodes = new THREE.Mesh(
-                    func,
-                    new THREE.MeshLambertMaterial({
-                        transparent: true,
-                        color: color,
-                        opacity: getNodeOpacity(
-                            node,
-                            search,
-                            highlightNodes,
-                            focusNode
-                        ),
-                    })
-                );
-                
-                const sprite = new SpriteText(node.nodeName);
+                const material = new THREE.MeshLambertMaterial({
+                    transparent: true,
+                    color: color,
+                    opacity: getNodeOpacity(node, search, highlightNodes, focusNode),
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                const sprite = new SpriteText(node.displayName || node.nodeName);
                 sprite.material.depthWrite = false;
-
-                // Get sprite color, have to change alpha channel as there is no other function
-                sprite.color = color
-                    .replace(
-                        ")",
-                        `,${getNodeOpacity(
-                            node,
-                            search,
-                            highlightNodes,
-                            focusNode
-                        )})`
-                    )
-                    .replace("rgb", "rgba");
-
+                const textColor = new THREE.Color(color);
+                sprite.color = textColor.getStyle();
+                sprite.material.opacity = material.opacity;
                 sprite.textHeight = 14;
                 sprite.position.set(0, 15, 0);
-
-                nodes.add(sprite);
-                return nodes;
+                mesh.add(sprite);
+                return mesh;
             }}
             nodeThreeObjectExtend={false}
-            linkCurvature={(link) => {
-                let test = false;
-                sharedProps.graphData?.links.forEach((link2: any) => {
-                    if (
-                        link2.target === link.source &&
-                        link2.source === link.target
-                    ) {
-                        test = true;
-                    }
-                });
-                if (test) {
-                    return 0.4;
-                } else {
-                    return 0;
+            onNodeDragEnd={(node) => {
+                if (node.x && node.y && node.z) {
+                    node.fx = node.x;
+                    node.fy = node.y;
+                    node.fz = node.z;
                 }
             }}
+
+            // Detailed Link Styling Props.
+            linkCurvature={(link) => (link.hasReciprocal ? 0.4 : 0)}
+            linkWidth={(link) =>
+                getLinkWidth(
+                    link, search, highlightLinks, antiPattern, selectedAntiPattern
+                )
+            }
+            linkColor={(link) =>{
+                switch (link.nodeType) {
+                    case 'uses': return 'rgba(65, 68, 249, 0.7)'; // Controller/Service -> Entity
+                    case 'dependency': return 'rgba(255, 165, 0, 0.7)'; // Controller -> Service
+                    case 'hierarchy': return 'rgba(150, 150, 150, 0.5)'; // MS -> Controller/Service -> Method
+                    default:
+                        return getLinkColor(
+                            link, search, hoverNode, antiPattern, true,
+                            selectedAntiPattern, focusNode, trackChanges
+                        );
+                }
+            }}
+            linkDirectionalArrowLength={(link) => link.nodeType === 'link' ? 10 : 0}
+            linkDirectionalArrowRelPos={sharedProps.linkDirectionalArrowRelPos}
+            linkDirectionalArrowColor={(link) =>
+                getLinkColor(
+                    link, search, hoverNode, antiPattern, true,
+                    selectedAntiPattern, focusNode, trackChanges
+                )
+            }
+            linkDirectionalParticles={(link: any) => {
+                if (link.nodeType === 'hierarchy') return 0;
+                return highlightLinks.has(link.name) || endpointCalls.includes(link.name) ? 4 : 0;
+            }}
+            linkDirectionalParticleWidth={(link) =>
+                getLinkWidth(
+                    link, search, highlightLinks, antiPattern, selectedAntiPattern
+                )
+            }
             linkDirectionalParticleSpeed={(link:any) =>{
                 if (highlightLinks.has(link.name)){
                     return 0.01;
@@ -271,66 +328,12 @@ const Graph: React.FC<Props> = ({
                 }
                 return 0.01;
             }}
-            linkDirectionalArrowLength={10}
-            linkDirectionalArrowRelPos={sharedProps.linkDirectionalArrowRelPos}
-            linkDirectionalArrowColor={(link) =>
-                getLinkColor(
-                    link,
-                    search,
-                    hoverNode,
-                    antiPattern,
-                    true,
-                    selectedAntiPattern,
-                    focusNode,
-                    trackChanges
-                )
-            }
-            linkDirectionalParticles={(link: any) => {
-                return highlightLinks.has(link.name) || endpointCalls.includes(link.name) ? 4 : 0;
-            }}
-            linkDirectionalParticleWidth={(link) =>
-                getLinkWidth(
-                    link,
-                    search,
-                    highlightLinks,
-                    antiPattern,
-                    selectedAntiPattern
-                )
-            }
-            linkColor={(link) =>
-                getLinkColor(
-                    link,
-                    search,
-                    hoverNode,
-                    antiPattern,
-                    true,
-                    selectedAntiPattern,
-                    focusNode,
-                    trackChanges
-                )
-            }
-            linkOpacity={undefined}
-            onNodeDragEnd={(node) => {
-                if (node.x && node.y && node.z) {
-                    node.fx = node.x;
-                    node.fy = node.y;
-                    node.fz = node.z;
-                }
-            }}
+            
+            // General props
             backgroundColor={"rgba(0,0,0,0)"}
-            onNodeClick={handleNodeClick}
-            onLinkClick={handleNodeClick}
+            onLinkClick={handleLinkClick}
             onNodeHover={handleNodeHover}
             onLinkHover={handleLinkHover}
-            linkWidth={(link) =>
-                getLinkWidth(
-                    link,
-                    search,
-                    highlightLinks,
-                    antiPattern,
-                    selectedAntiPattern
-                )
-            }
         />
     );
 };

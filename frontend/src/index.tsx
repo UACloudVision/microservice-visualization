@@ -1,12 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import { setupAxios, setupLogger } from "./utils/axiosSetup";
-import getData from "./getData.js";
-import axios from "axios";
-
 
 setupLogger();
 setupAxios();

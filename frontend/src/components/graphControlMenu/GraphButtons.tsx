@@ -1,8 +1,7 @@
 import { saveAs } from "file-saver";
 import React, { useState } from "react";
-import { reset } from "../../utils/GraphFunctions";
+import { reset } from "../../utils/graphFunctions";
 import axios from "axios";
-import myData from "../../data/mock1.json";
 
 type ButtonProps = {
     onClick: any;
@@ -19,8 +18,10 @@ type ButtonProps = {
 const GraphButton: React.FC<ButtonProps> = ({ onClick, ...props }) => {
     return (
         <button
-            className={`border-2 border-slate-500 rounded-lg px-2 py-1 text-center text-sm text-gray-700 mx-2 transition
-             bg-white hover:bg-opacity-50 border-opacity-40`}
+            className={`rounded-xl px-4 py-2 text-center text-base font-semibold transition-all duration-200
+            bg-slate-800/70 border border-slate-700
+            text-white hover:bg-slate-700 hover:border-slate-600
+            focus:outline-none focus:ring-2 focus:ring-indigo-500`}
             onClick={onClick}
         >
             {props.children}
