@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import Slider from "./Slider";
-import {
-  countBottleneck,
-  countCyclic,
-  countHighCoupling,
-  countMegaservice,
-} from "../../utils/antipatternUtils";
 import AntipatternOption from "./AntipatternOption";
+// import {
+//   countBottleneck,
+//   countCyclic,
+//   countHighCoupling,
+//   countMegaservice,
+// } from "../../utils/antipatternUtils";
 
 type Props = {
   value: number;

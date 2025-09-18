@@ -1,6 +1,5 @@
 import React from "react";
 import { ForceGraphProps as SharedProps } from "react-force-graph-2d";
-
 import Graph3D from "./Graph3D";
 
 type Props = {
@@ -24,6 +23,10 @@ type Props = {
     focusNode: any;
     endpointCalls: any;
     trackChanges: any;
+    
+    expandedNodes: Set<string>;
+    isHighLevelExpanded: boolean;
+    setExpandedNodes: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
 const VisualizationOptions: React.FC<Props> = ({
@@ -47,33 +50,21 @@ const VisualizationOptions: React.FC<Props> = ({
     focusNode,
     endpointCalls,
     trackChanges,
+    expandedNodes,
+    setExpandedNodes,
+    isHighLevelExpanded
 }) => {
     const Shared2D3DProps: SharedProps = {
         linkDirectionalArrowRelPos: 1,
-        graphData: graphData,
+        graphData: graphData || {nodes: [], links: []},
     };
 
     const GraphProps = {
         sharedProps: Shared2D3DProps,
     };
     
-
     return (
         <div>
-            {/* {!is3d ? (
-                <Graph2D
-                    width={width}
-                    height={height}
-                    {...GraphProps}
-                    search={search}
-                    graphRef={graphRef}
-                    threshold={threshold}
-                    setInitCoords={setInitCoords}
-                    setInitRotation={setInitRotation}
-                    antiPattern={antiPattern}
-                    colorMode={colorMode}
-                />
-            ) : ( */}
             <Graph3D
                 width={width}
                 height={height}
@@ -94,6 +85,9 @@ const VisualizationOptions: React.FC<Props> = ({
                 focusNode={focusNode}
                 endpointCalls={endpointCalls}
                 trackChanges={trackChanges}
+                expandedNodes={expandedNodes}
+                setExpandedNodes={setExpandedNodes}
+                isHighLevelExpanded={isHighLevelExpanded}
             />
         </div>
     );
