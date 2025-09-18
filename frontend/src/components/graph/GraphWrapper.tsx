@@ -1,6 +1,5 @@
 import React from "react";
 import { ForceGraphProps as SharedProps } from "react-force-graph-2d";
-
 import Graph3D from "./Graph3D";
 
 type Props = {
@@ -57,14 +56,13 @@ const VisualizationOptions: React.FC<Props> = ({
 }) => {
     const Shared2D3DProps: SharedProps = {
         linkDirectionalArrowRelPos: 1,
-        graphData: graphData,
+        graphData: graphData || {nodes: [], links: []},
     };
 
     const GraphProps = {
         sharedProps: Shared2D3DProps,
     };
     
-
     return (
         <div>
             <Graph3D

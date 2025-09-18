@@ -111,10 +111,10 @@ const TimeSlider: React.FC<Props> = ({
                                     Commit #{graphTimeline[currentInstance].commitID.substring(0, 7)}
                                 </div>
                                 <div>
-                                    Created: {graphTimeline[currentInstance].createDate}
+                                    Created: {(graphTimeline[currentInstance].createDate || "Not Found")}
                                 </div>
                                 <div>
-                                    Modified: {graphTimeline[currentInstance].modifyDate}
+                                    Modified: {(graphTimeline[currentInstance].modifyDate || "Not Found")}
                                 </div>
                             </>
                         )}

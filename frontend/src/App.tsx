@@ -58,6 +58,23 @@ function App(data: any) {
     // Notification state
     const [notification, setNotification] = useState<Notification | null>(null);
 
+    // Global error Handel for mitigating all unhandled errors. 
+    useEffect(() => {
+        const handleError = (event: ErrorEvent) => {
+            event.preventDefault();
+            showError("A temporary graph interaction error occurred.");
+            // Forcing a state update here to try and recover the graph
+            // setGraphData(prevData => ({ ...prevData }));
+        };
+
+        window.addEventListener('error', handleError);
+
+        // Cleaning up the listener when the component unmounts.
+        return () => {
+            window.removeEventListener('error', handleError);
+        };
+    }, []); 
+
     // Set up notification callback when component mounts
     useEffect(() => {
         setNotificationCallback((notificationData: Notification) => {

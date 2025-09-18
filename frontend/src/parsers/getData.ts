@@ -39,6 +39,8 @@ export interface Microservice {
 export interface IRData {
     microservices: Microservice[];
     commitID?: string;
+    createDate: string | null;
+    modifyDate: string | null;
 }
 
 function findMethodByUrl(callUrl: string, methodsDict: { [key: string]: any }): any | null {
